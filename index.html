@@ -40,11 +40,11 @@
     };
   </script>
 
-  <!-- Dinamik @page Boyutu (PC Chrome Yazıcı Çıktısı İçin Kritik) -->
+  <!-- Dinamik @page Boyutu (PC Chrome Yazıcı Çıktısı İçin Kritik - !important OLMAMALI) -->
   <style id="dynamic-page-style">
     @page {
       size: 70mm 44mm;
-      margin: 0mm !important;
+      margin: 0;
     }
   </style>
 
@@ -104,8 +104,9 @@
         margin: 0 !important;
         padding: 0 !important;
         background: #ffffff !important;
-        width: auto !important;
+        width: var(--label-w) !important;
         height: auto !important;
+        min-height: 0 !important;
         overflow: visible !important;
       }
 
@@ -116,8 +117,10 @@
 
       #print-area {
         display: block !important;
+        position: static !important;
         margin: 0 !important;
         padding: 0 !important;
+        width: var(--label-w) !important;
       }
 
       .print-page {
@@ -130,6 +133,7 @@
         break-after: page !important;
         page-break-inside: avoid !important;
         break-inside: avoid !important;
+        overflow: hidden !important;
       }
 
       .print-page:last-child {
@@ -1097,7 +1101,8 @@ EDİNİZ</textarea>
         document.documentElement.style.setProperty('--label-h', state.labelH + 'mm');
 
         const pageStyle = document.getElementById('dynamic-page-style');
-        pageStyle.textContent = `@page { size: ${state.labelW}mm ${state.labelH}mm; margin: 0mm !important; }`;
+        // NOT: @page kuralı içinde !important kullanılmaz, aksi halde Chrome ölçüyü ve margin:0 kuralını yok sayar
+        pageStyle.textContent = `@page { size: ${state.labelW}mm ${state.labelH}mm; margin: 0; }`;
 
         document.getElementById('preview-dim-text').textContent = `${state.labelW} × ${state.labelH} mm • Birebir Oran`;
         document.getElementById('tip-size-span').textContent = `${state.labelW} × ${state.labelH} mm`;
@@ -1191,15 +1196,17 @@ EDİNİZ</textarea>
           leftCol.style.justifyContent = 'center';
 
           const tEl = document.createElement('div');
+          tEl.className = 'h2c-text';
           tEl.textContent = displayName || 'ÜRÜN ADI';
           tEl.style.fontWeight = '900';
           tEl.style.fontSize = `${finalPt.toFixed(1)}pt`;
-          tEl.style.lineHeight = '1.12';
+          tEl.style.lineHeight = '1.16';
           tEl.style.wordBreak = 'break-word';
           leftCol.appendChild(tEl);
 
           if (s.showCode && item.code) {
             const cEl = document.createElement('div');
+            cEl.className = 'h2c-text';
             cEl.textContent = `${s.prefix}${item.code}`;
             cEl.style.fontWeight = '800';
             cEl.style.fontSize = `${(8.5 * widthRatio).toFixed(1)}pt`;
@@ -1209,6 +1216,7 @@ EDİNİZ</textarea>
 
           if (s.showVal && item.barcode) {
             const vEl = document.createElement('div');
+            vEl.className = 'h2c-text';
             vEl.textContent = item.barcode;
             vEl.style.fontWeight = '700';
             vEl.style.fontSize = `${(7.8 * widthRatio).toFixed(1)}pt`;
@@ -1238,20 +1246,22 @@ EDİNİZ</textarea>
           headerDiv.style.minHeight = '0';
 
           const titleEl = document.createElement('div');
+          titleEl.className = 'h2c-text';
           titleEl.textContent = displayName || 'ÜRÜN ADI';
           titleEl.style.fontWeight = '900';
           titleEl.style.fontSize = `${finalPt.toFixed(1)}pt`;
-          titleEl.style.lineHeight = '1.12';
+          titleEl.style.lineHeight = '1.16';
           titleEl.style.width = '100%';
           titleEl.style.wordBreak = 'break-word';
           headerDiv.appendChild(titleEl);
 
           if (s.showCode && item.code) {
             const codeEl = document.createElement('div');
+            codeEl.className = 'h2c-text';
             codeEl.textContent = `${s.prefix}${item.code}`;
             codeEl.style.fontWeight = '800';
             codeEl.style.fontSize = `${(8.8 * widthRatio).toFixed(1)}pt`;
-            codeEl.style.marginTop = '0.7mm';
+            codeEl.style.marginTop = '0.8mm';
             headerDiv.appendChild(codeEl);
           }
 
@@ -1296,11 +1306,12 @@ EDİNİZ</textarea>
 
             if (s.showVal && barcodeText) {
               const valEl = document.createElement('div');
+              valEl.className = 'h2c-text';
               valEl.textContent = barcodeText;
               valEl.style.fontWeight = '800';
               valEl.style.fontSize = `${(9 * widthRatio).toFixed(1)}pt`;
               valEl.style.letterSpacing = '0.04em';
-              valEl.style.marginTop = '0.6mm';
+              valEl.style.marginTop = '0.7mm';
               bcWrap.appendChild(valEl);
             }
             inner.appendChild(bcWrap);
@@ -1310,16 +1321,22 @@ EDİNİZ</textarea>
         // Ek Alt Not Şeridi (Opsiyonel)
         if (s.extraNote) {
           const noteEl = document.createElement('div');
-          noteEl.textContent = s.useUpper ? turkishUpper(s.extraNote) : s.extraNote;
           noteEl.style.width = '100%';
-          noteEl.style.textAlign = 'center';
-          noteEl.style.fontSize = `${(6.8 * widthRatio).toFixed(1)}pt`;
-          noteEl.style.fontWeight = '800';
+          noteEl.style.display = 'flex';
+          noteEl.style.alignItems = 'center';
+          noteEl.style.justifyContent = 'center';
           noteEl.style.background = '#000000';
           noteEl.style.color = '#ffffff';
-          noteEl.style.padding = '0.4mm 1mm';
-          noteEl.style.marginTop = '0.6mm';
+          noteEl.style.padding = '0.7mm 1.2mm';
+          noteEl.style.marginTop = '0.8mm';
           noteEl.style.borderRadius = '0.6mm';
+          const noteSpan = document.createElement('span');
+          noteSpan.className = 'h2c-text';
+          noteSpan.textContent = s.useUpper ? turkishUpper(s.extraNote) : s.extraNote;
+          noteSpan.style.fontSize = `${(6.8 * widthRatio).toFixed(1)}pt`;
+          noteSpan.style.fontWeight = '800';
+          noteSpan.style.lineHeight = '1.15';
+          noteEl.appendChild(noteSpan);
           inner.appendChild(noteEl);
         }
 
@@ -1416,21 +1433,29 @@ EDİNİZ</textarea>
 
         safeLines.forEach((lineText, idx) => {
           const lineEl = document.createElement('div');
-          lineEl.textContent = lineText;
           lineEl.style.wordBreak = 'break-word';
+
+          const lineSpan = document.createElement('span');
+          lineSpan.className = 'h2c-text';
+          lineSpan.textContent = lineText;
+          lineSpan.style.display = 'inline-block';
 
           if (idx === 0 && s.invertHeader && !s.invertAll) {
             lineEl.style.background = '#000000';
             lineEl.style.color = '#ffffff';
-            lineEl.style.padding = '0.7mm 2mm';
+            lineEl.style.padding = '0.9mm 2mm';
             lineEl.style.borderRadius = '1mm';
-            lineEl.style.marginBottom = '1mm';
-            lineEl.style.fontSize = `${Math.max(8, computedPt * 0.86).toFixed(1)}pt`;
+            lineEl.style.marginBottom = '1.1mm';
+            lineEl.style.display = 'flex';
+            lineEl.style.alignItems = 'center';
+            lineEl.style.justifyContent = s.align === 'center' ? 'center' : s.align === 'left' ? 'flex-start' : 'flex-end';
+            lineSpan.style.fontSize = `${Math.max(8, computedPt * 0.86).toFixed(1)}pt`;
           } else if (idx === 0 && s.firstAccent && safeLines.length > 1) {
-            lineEl.style.fontSize = `${(computedPt * 1.12).toFixed(1)}pt`;
+            lineSpan.style.fontSize = `${(computedPt * 1.12).toFixed(1)}pt`;
           } else {
-            lineEl.style.fontSize = `${computedPt.toFixed(1)}pt`;
+            lineSpan.style.fontSize = `${computedPt.toFixed(1)}pt`;
           }
+          lineEl.appendChild(lineSpan);
           textBlock.appendChild(lineEl);
         });
 
@@ -1506,47 +1531,60 @@ EDİNİZ</textarea>
         const label = document.createElement('div');
         label.className = 'thermal-label';
         label.style.fontFamily = 'Inter, Arial, sans-serif';
-        label.style.padding = '1.8mm';
+        label.style.padding = '1.6mm';
 
         const inner = document.createElement('div');
         inner.style.width = '100%';
         inner.style.height = '100%';
-        inner.style.border = '0.8mm solid #000000';
+        inner.style.border = '0.7mm solid #000000';
         inner.style.borderRadius = '1.6mm';
         inner.style.display = 'flex';
         inner.style.flexDirection = 'column';
         inner.style.justifyContent = 'space-between';
         inner.style.overflow = 'hidden';
+        inner.style.boxSizing = 'border-box';
 
-        // 1. Üst Ürün Adı
+        // 1. Üst Ürün Adı (Dikeyde tam ortalı, alt çizgiye binmeyen ferah boşluk)
         const prod = document.createElement('div');
         const pText = turkishUpper(s.product || 'ÜRÜN ADI');
-        prod.textContent = pText;
+        prod.style.display = 'flex';
+        prod.style.alignItems = 'center';
+        prod.style.justifyContent = 'center';
         prod.style.textAlign = 'center';
-        prod.style.fontWeight = '900';
-        prod.style.fontSize = `${((pText.length > 26 ? 9.5 : 11.5) * widthRatio).toFixed(1)}pt`;
-        prod.style.lineHeight = '1.12';
-        prod.style.padding = '1.4mm 1.8mm 1mm 1.8mm';
-        prod.style.borderBottom = '0.5mm solid #000000';
+        prod.style.padding = '1.4mm 2mm';
+        prod.style.borderBottom = '0.45mm solid #000000';
+        prod.style.flexShrink = '0';
+
+        const prodSpan = document.createElement('span');
+        prodSpan.className = 'h2c-text';
+        prodSpan.textContent = pText;
+        prodSpan.style.fontWeight = '900';
+        const prodPt = pText.length > 32 ? 8.2 : pText.length > 22 ? 9.2 : 10.8;
+        prodSpan.style.fontSize = `${(prodPt * widthRatio).toFixed(1)}pt`;
+        prodSpan.style.lineHeight = '1.18';
+        prod.appendChild(prodSpan);
         inner.appendChild(prod);
 
         // 2. Orta Tarih Tablosu (ÜRT & SKT)
         const mid = document.createElement('div');
-        mid.style.flex = '1';
+        mid.style.flex = '1 1 auto';
+        mid.style.minHeight = '0';
         mid.style.display = 'grid';
         mid.style.gridTemplateColumns = '1fr 1fr';
         mid.style.alignItems = 'center';
-        mid.style.padding = '0.8mm 1.5mm';
+        mid.style.padding = '1mm 1.5mm';
         mid.style.gap = '1mm';
 
         const urtBox = document.createElement('div');
         urtBox.style.textAlign = 'center';
         urtBox.style.borderRight = '0.4mm dashed #000000';
-        urtBox.innerHTML = `<div style="font-size:${(6.8 * widthRatio).toFixed(1)}pt;font-weight:800;">ÜRETİM (ÜRT)</div><div style="font-size:${(10.5 * widthRatio).toFixed(1)}pt;font-weight:900;margin-top:0.4mm;">${formatDateTR(s.urt)}</div>`;
+        urtBox.style.padding = '0.5mm 0';
+        urtBox.innerHTML = `<div class="h2c-text" style="font-size:${(6.6 * widthRatio).toFixed(1)}pt;font-weight:800;line-height:1.2;">ÜRETİM (ÜRT)</div><div class="h2c-text" style="font-size:${(10.2 * widthRatio).toFixed(1)}pt;font-weight:900;line-height:1.2;margin-top:0.8mm;">${formatDateTR(s.urt)}</div>`;
 
         const expBox = document.createElement('div');
         expBox.style.textAlign = 'center';
-        expBox.innerHTML = `<div style="font-size:${(6.8 * widthRatio).toFixed(1)}pt;font-weight:800;">SON KULLANMA (SKT)</div><div style="font-size:${(10.5 * widthRatio).toFixed(1)}pt;font-weight:900;margin-top:0.4mm;">${formatDateTR(s.exp)}</div>`;
+        expBox.style.padding = '0.5mm 0';
+        expBox.innerHTML = `<div class="h2c-text" style="font-size:${(6.6 * widthRatio).toFixed(1)}pt;font-weight:800;line-height:1.2;">SON KULLANMA (SKT)</div><div class="h2c-text" style="font-size:${(10.2 * widthRatio).toFixed(1)}pt;font-weight:900;line-height:1.2;margin-top:0.8mm;">${formatDateTR(s.exp)}</div>`;
 
         mid.appendChild(urtBox);
         mid.appendChild(expBox);
@@ -1558,25 +1596,33 @@ EDİNİZ</textarea>
           meta.style.display = 'flex';
           meta.style.justifyContent = 'space-between';
           meta.style.alignItems = 'center';
-          meta.style.padding = '0.8mm 2mm';
-          meta.style.borderTop = '0.4mm solid #000000';
-          meta.style.fontSize = `${(7.5 * widthRatio).toFixed(1)}pt`;
-          meta.style.fontWeight = '800';
-          meta.innerHTML = `<span>${escapeHtml(s.lot ? 'PARTİ: ' + s.lot : '')}</span><span>${escapeHtml(turkishUpper(s.weight))}</span>`;
+          meta.style.padding = '1.2mm 2.2mm';
+          meta.style.borderTop = '0.45mm solid #000000';
+          meta.style.flexShrink = '0';
+          meta.innerHTML = `<span class="h2c-text" style="font-size:${(7.2 * widthRatio).toFixed(1)}pt;font-weight:800;line-height:1.2;">${escapeHtml(s.lot ? 'PARTİ: ' + s.lot : '')}</span><span class="h2c-text" style="font-size:${(7.2 * widthRatio).toFixed(1)}pt;font-weight:800;line-height:1.2;">${escapeHtml(turkishUpper(s.weight))}</span>`;
           inner.appendChild(meta);
         }
 
         // 4. Alt Saklama Koşulu Siyah Şeridi
         if (s.storage) {
           const foot = document.createElement('div');
-          foot.textContent = turkishUpper(s.storage);
           foot.style.background = '#000000';
           foot.style.color = '#ffffff';
+          foot.style.display = 'flex';
+          foot.style.alignItems = 'center';
+          foot.style.justifyContent = 'center';
           foot.style.textAlign = 'center';
-          foot.style.fontWeight = '900';
-          foot.style.fontSize = `${(7.8 * widthRatio).toFixed(1)}pt`;
-          foot.style.padding = '1mm 1.5mm';
-          foot.style.letterSpacing = '0.02em';
+          foot.style.padding = '1.3mm 1.8mm';
+          foot.style.flexShrink = '0';
+
+          const footSpan = document.createElement('span');
+          footSpan.className = 'h2c-text';
+          footSpan.textContent = turkishUpper(s.storage);
+          footSpan.style.fontWeight = '900';
+          footSpan.style.fontSize = `${(7.6 * widthRatio).toFixed(1)}pt`;
+          footSpan.style.lineHeight = '1.18';
+          footSpan.style.letterSpacing = '0.02em';
+          foot.appendChild(footSpan);
           inner.appendChild(foot);
         }
 
@@ -1717,15 +1763,42 @@ EDİNİZ</textarea>
         });
         printArea.appendChild(frag);
 
+        // Chrome üstbilgi basarsa bile başlık görünmesin diye geçici olarak temizle
+        const origTitle = document.title;
+        document.title = ' ';
+
+        const restoreTitle = () => {
+          document.title = origTitle;
+          window.removeEventListener('afterprint', restoreTitle);
+        };
+        window.addEventListener('afterprint', restoreTitle);
+
         // Tarayıcıya SVG ve QR canvas'ları çizmesi için kısa bir süre verip yazıcı penceresini aç
         setTimeout(() => {
           window.print();
-        }, 140);
+          setTimeout(restoreTitle, 1000);
+        }, 160);
       }
 
       // ==========================================================
       // 7. GERÇEK ÇOK SAYFALI PDF İNDİRME MOTORU (jsPDF + html2canvas)
       // ==========================================================
+      // html2canvas 1.4.1'deki metin aşağı kayma (baseline shift) hatasını düzelten yardımcı
+      function getHtml2CanvasOptions(bgColor) {
+        return {
+          scale: 3,
+          backgroundColor: bgColor || '#ffffff',
+          useCORS: true,
+          logging: false,
+          onclone: (clonedDoc) => {
+            clonedDoc.querySelectorAll('.h2c-text').forEach((node) => {
+              node.style.position = 'relative';
+              node.style.top = '-0.55mm';
+            });
+          }
+        };
+      }
+
       async function executePdfDownload() {
         const jobs = getActivePrintJobs();
         const total = jobs.reduce((s, j) => s + j.qty, 0);
@@ -1737,6 +1810,10 @@ EDİNİZ</textarea>
         if (!window.jspdf || !window.html2canvas) {
           showToast('PDF kütüphaneleri henüz yüklenmedi, lütfen internet bağlantınızı kontrol edin.', 'error');
           return;
+        }
+
+        if (document.fonts && document.fonts.ready) {
+          await document.fonts.ready;
         }
 
         state.pdfCancelled = false;
@@ -1771,13 +1848,8 @@ EDİNİZ</textarea>
             const el = job.build();
             sandbox.appendChild(el);
 
-            // Canvas'a yüksek çözünürlükle (scale: 3 ≈ 288 DPI) aktar
-            const canvas = await html2canvas(el, {
-              scale: 3,
-              backgroundColor: el.style.background || '#ffffff',
-              useCORS: true,
-              logging: false
-            });
+            // Canvas'a yüksek çözünürlükle (scale: 3 ≈ 288 DPI) ve baseline düzeltmesiyle aktar
+            const canvas = await html2canvas(el, getHtml2CanvasOptions(el.style.background));
             const imgData = canvas.toDataURL('image/png');
 
             for (let c = 0; c < job.qty; c++) {
@@ -1825,12 +1897,17 @@ EDİNİZ</textarea>
           return;
         }
         try {
+          if (document.fonts && document.fonts.ready) {
+            await document.fonts.ready;
+          }
           const sandbox = document.getElementById('pdf-render-sandbox');
           sandbox.innerHTML = '';
           const clone = previewEl.cloneNode(true);
           sandbox.appendChild(clone);
 
-          const canvas = await html2canvas(clone, { scale: 4, backgroundColor: clone.style.background || '#ffffff', logging: false });
+          const opts = getHtml2CanvasOptions(clone.style.background);
+          opts.scale = 4;
+          const canvas = await html2canvas(clone, opts);
           sandbox.innerHTML = '';
 
           const link = document.createElement('a');
