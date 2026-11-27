@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ERD Termal Etiket &amp; Barkod Stüdyosu Pro</title>
+  <title>TAC Termal Etiket &amp; Barkod Stüdyosu Pro</title>
 
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -167,7 +167,7 @@
         <div>
           <div class="flex items-center gap-2">
             <h1 class="text-base sm:text-lg font-extrabold tracking-tight text-slate-900 leading-tight">
-              ERD Etiket Stüdyosu
+              TAC Termal Etiket Stüdyosu
             </h1>
             <span class="text-[10px] font-extrabold uppercase tracking-wider bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full">
               PRO v2.0
@@ -185,7 +185,7 @@
         <div class="flex items-center gap-1.5 bg-slate-100 p-1 rounded-xl border border-slate-200 text-xs">
           <span class="pl-2 font-bold text-slate-600 hidden xl:inline">Ölçü:</span>
           <select id="size-preset" class="bg-white border border-slate-200 rounded-lg px-2 py-1.5 font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-900 cursor-pointer">
-            <option value="70x44" selected>70 × 44 mm (ERD)</option>
+            <option value="70x44" selected>70 × 44 mm (TAC)</option>
             <option value="64x38">64 × 38 mm</option>
             <option value="60x40">60 × 40 mm</option>
             <option value="50x30">50 × 30 mm</option>
@@ -337,7 +337,7 @@
               <div>
                 <label class="block text-xs font-bold text-slate-700 mb-1">Barkod / Kod Türü</label>
                 <select id="bc-format" class="w-full text-xs font-bold bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-2 focus:outline-none focus:ring-2 focus:ring-slate-900">
-                  <option value="CODE128" selected>Code 128 (Önerilen / ERD)</option>
+                  <option value="CODE128" selected>Code 128 (Önerilen / TAC)</option>
                   <option value="EAN13">EAN-13 (13 Haneli)</option>
                   <option value="CODE39">Code 39</option>
                   <option value="QR">QR Kod (Karekod)</option>
@@ -905,11 +905,11 @@ EDİNİZ</textarea>
   <div id="chrome-help-modal" class="hidden fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4">
     <div class="bg-white rounded-2xl shadow-xl border border-slate-200 w-full max-w-lg p-6 space-y-4">
       <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-        <h3 class="text-base font-extrabold text-slate-900">PC Chrome Termal Yazıcı (ERD) Ayarları</h3>
+        <h3 class="text-base font-extrabold text-slate-900">PC Chrome Termal Yazıcı (TAC) Ayarları</h3>
         <button id="btn-close-chrome-help" class="text-slate-400 hover:text-slate-700 font-bold text-lg cursor-pointer">✕</button>
       </div>
       <ol class="space-y-2.5 text-xs text-slate-700 leading-relaxed list-decimal pl-4">
-        <li><strong>Hedef (Yazıcı):</strong> Bilgisayarınıza bağlı <strong>ERD / Termal Barkod Yazıcınızı</strong> seçin.</li>
+        <li><strong>Hedef (Yazıcı):</strong> Bilgisayarınıza bağlı <strong>TAC / Termal Barkod Yazıcınızı</strong> seçin.</li>
         <li><strong>Diğer Ayarlar &gt; Kağıt Boyutu:</strong> Windows Yazıcı Tercihlerinden tanımladığınız <strong>70 × 44 mm</strong> (veya seçtiğiniz ölçü) kağıdı seçin.</li>
         <li><strong>Kenar Boşlukları:</strong> Mutlaka <strong>Yok (None)</strong> olarak ayarlayın.</li>
         <li><strong>Ölçek:</strong> <strong>Varsayılan</strong> veya <strong>Özel: 100</strong> yapın ("Sayfaya Sığdır" seçmeyin).</li>
@@ -934,7 +934,7 @@ EDİNİZ</textarea>
       // ==========================================================
       // 1. DURUM YÖNETİMİ (STATE) & 114 ŞABLON KÜTÜPHANESİ
       // ==========================================================
-      const STORAGE_KEY_TEMPLATES = 'erd_studio_pro_templates_v2';
+      const STORAGE_KEY_TEMPLATES = 'tac_studio_pro_templates_v2';
 
       const state = {
         activeTab: 'excel', // 'excel' | 'text' | 'skt' | 'queue'
