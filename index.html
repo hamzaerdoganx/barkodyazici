@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>TAC Termal Etiket &amp; Barkod Stüdyosu Pro</title>
+  <title>DEPO Etiket &amp; Barkod Stüdyosu Pro</title>
 
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -489,22 +489,31 @@
           <!-- 1. Kategorili Hazır Şablon Kütüphanesi -->
           <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 space-y-3">
             <div class="flex flex-wrap items-center justify-between gap-2">
-              <h2 class="text-sm font-extrabold text-slate-900">Hazır Etiket Şablonları</h2>
-              <button id="btn-save-template" class="text-xs font-bold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 px-3 py-1.5 rounded-lg transition cursor-pointer">
-                + Mevcut Tasarımı Kaydet
-              </button>
+              <div class="flex items-center gap-2">
+                <h2 class="text-sm font-extrabold text-slate-900">Hazır Etiket Şablonları</h2>
+                <span id="tpl-count-badge" class="text-[11px] font-extrabold bg-slate-100 text-slate-700 px-2 py-0.5 rounded-full">114 Şablon</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <input type="text" id="template-search" placeholder="Şablon ara..." class="w-36 sm:w-44 text-xs font-semibold bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-slate-900" />
+                <button id="btn-save-template" class="text-xs font-bold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 px-3 py-1.5 rounded-lg transition cursor-pointer">
+                  + Mevcut Tasarımı Kaydet
+                </button>
+              </div>
             </div>
 
             <!-- Kategori Filtreleri -->
-            <div id="template-cat-bar" class="flex flex-wrap gap-1.5 pb-1 border-b border-slate-100 text-xs">
+            <div id="template-cat-bar" class="flex flex-wrap gap-1.5 pb-2 border-b border-slate-100 text-xs">
               <button type="button" data-cat="all" class="tpl-cat-btn px-2.5 py-1 rounded-lg font-bold bg-slate-900 text-white cursor-pointer">Tümü</button>
-              <button type="button" data-cat="cold" class="tpl-cat-btn px-2.5 py-1 rounded-lg font-bold bg-slate-100 text-slate-600 hover:bg-slate-200 cursor-pointer">Soğuk Zincir &amp; Gıda</button>
+              <button type="button" data-cat="cold" class="tpl-cat-btn px-2.5 py-1 rounded-lg font-bold bg-slate-100 text-slate-600 hover:bg-slate-200 cursor-pointer">Soğuk Zincir &amp; Muhafaza</button>
+              <button type="button" data-cat="kitchen" class="tpl-cat-btn px-2.5 py-1 rounded-lg font-bold bg-slate-100 text-slate-600 hover:bg-slate-200 cursor-pointer">Mutfak &amp; HACCP</button>
+              <button type="button" data-cat="allergen" class="tpl-cat-btn px-2.5 py-1 rounded-lg font-bold bg-slate-100 text-slate-600 hover:bg-slate-200 cursor-pointer">Alerjen &amp; Diyet</button>
               <button type="button" data-cat="shipping" class="tpl-cat-btn px-2.5 py-1 rounded-lg font-bold bg-slate-100 text-slate-600 hover:bg-slate-200 cursor-pointer">Sevkiyat &amp; Kargo</button>
-              <button type="button" data-cat="warehouse" class="tpl-cat-btn px-2.5 py-1 rounded-lg font-bold bg-slate-100 text-slate-600 hover:bg-slate-200 cursor-pointer">Depo &amp; Raf</button>
+              <button type="button" data-cat="warehouse" class="tpl-cat-btn px-2.5 py-1 rounded-lg font-bold bg-slate-100 text-slate-600 hover:bg-slate-200 cursor-pointer">Depo, Raf &amp; Kalite</button>
+              <button type="button" data-cat="retail" class="tpl-cat-btn px-2.5 py-1 rounded-lg font-bold bg-slate-100 text-slate-600 hover:bg-slate-200 cursor-pointer">Mağaza &amp; İade</button>
               <button type="button" data-cat="custom" class="tpl-cat-btn px-2.5 py-1 rounded-lg font-bold bg-slate-100 text-slate-600 hover:bg-slate-200 cursor-pointer">Kayıtlılarım</button>
             </div>
 
-            <div id="preset-templates-grid" class="flex flex-wrap gap-2 max-h-44 overflow-y-auto pt-1">
+            <div id="preset-templates-grid" class="flex flex-wrap gap-2 max-h-56 overflow-y-auto pt-1">
               <!-- JS ile doldurulacak -->
             </div>
           </div>
@@ -935,1477 +944,186 @@ EDİNİZ</textarea>
         previewIndex: 0,
         searchQuery: '',
         activeTplCategory: 'all',
+        templateSearchQuery: '',
         savedTemplates: [],
         queue: [], // { id, title, badge, qty, builderType, payload }
         queuePreviewIndex: 0,
         pdfCancelled: false
       };
 
-      // 16+ Kategorili Hazır Şablon
+      // 114 Adet Kategorili Hazır Şablon Kütüphanesi
       const DEFAULT_TEMPLATES = [
-        // SOĞUK ZİNCİR & GIDA
+        // ========================================================
+        // 1. SOĞUK ZİNCİR & MUHAFAZA (22 ŞABLON)
+        // ========================================================
         { id: 'c1', cat: 'cold', label: "+4 °C Muhafaza", text: "+4 °C'DE\nMUHAFAZA\nEDİNİZ", icon: 'none', border: 'none', firstAccent: true, invertHeader: false, invertAll: false },
         { id: 'c2', cat: 'cold', label: "Soğuk Zincir (+4 °C)", text: "SOĞUK ZİNCİR ÜRÜNÜ\n+4 °C'DE MUHAFAZA\nEDİNİZ", icon: 'snowflake', border: 'solid-thick', firstAccent: false, invertHeader: true, invertAll: false },
         { id: 'c3', cat: 'cold', label: "0 / +4 °C Saklayınız", text: "DİKKAT! SOĞUK ZİNCİR\n0 / +4 °C ARASINDA\nMUHAFAZA EDİNİZ", icon: 'thermometer', border: 'solid-thin', firstAccent: false, invertHeader: true, invertAll: false },
         { id: 'c4', cat: 'cold', label: "-18 °C Donuk Ürün", text: "DONUK ÜRÜN\n-18 °C'DE MUHAFAZA\nEDİNİZ", icon: 'snowflake', border: 'solid-thick', firstAccent: false, invertHeader: true, invertAll: false },
         { id: 'c5', cat: 'cold', label: "Çözündükten Sonra", text: "ÇÖZÜNDÜKTEN SONRA\nTEKRAR DONDURMAYINIZ\n+4 °C'DE SAKLAYINIZ", icon: 'warning', border: 'solid-thin', firstAccent: false, invertHeader: true, invertAll: false },
         { id: 'c6', cat: 'cold', label: "Kuru ve Serin Yer", text: "SERİN VE KURU\nYERDE MUHAFAZA\nEDİNİZ", icon: 'none', border: 'solid-thin', firstAccent: false, invertHeader: false, invertAll: false },
-        { id: 'c7', cat: 'cold', label: "Alerjen Uyarısı", text: "ALERJEN UYARISI\nSÜT, GLUTEN VE KURUYEMİŞ\nİÇEREBİLİR", icon: 'warning', border: 'double', firstAccent: false, invertHeader: true, invertAll: false },
+        { id: 'c7', cat: 'cold', label: "+2 / +8 °C Medikal/Gıda", text: "+2 °C / +8 °C\nARASINDA SOĞUK\nMUHAFAZA EDİNİZ", icon: 'thermometer', border: 'solid-thick', firstAccent: true, invertHeader: false, invertAll: false },
+        { id: 'c8', cat: 'cold', label: "Buzdolabında Saklayınız", text: "BUZDOLABINDA\nMUHAFAZA\nEDİNİZ", icon: 'snowflake', border: 'solid-thin', firstAccent: false, invertHeader: false, invertAll: false },
+        { id: 'c9', cat: 'cold', label: "Derin Dondurucu (-18 °C)", text: "DERİN DONDURUCUDA\n-18 °C'DE\nSAKLAYINIZ", icon: 'snowflake', border: 'double', firstAccent: false, invertHeader: true, invertAll: false },
+        { id: 'c10', cat: 'cold', label: "Güneşten Koruyunuz", text: "DOĞRUDAN GÜNEŞ\nIŞIĞINDAN\nKORUYUNUZ", icon: 'warning', border: 'solid-thin', firstAccent: false, invertHeader: true, invertAll: false },
+        { id: 'c11', cat: 'cold', label: "Dondurmayınız!", text: "DİKKAT!\nDONDURMAYINIZ\n+4 °C'DE TUTUNUZ", icon: 'warning', border: 'solid-thick', firstAccent: true, invertHeader: false, invertAll: true },
+        { id: 'c12', cat: 'cold', label: "Soğuk Zinciri Kırmayınız", text: "SOĞUK ZİNCİRİ\nKIRMAYINIZ!\nDERHAL DOLABA ALINIZ", icon: 'snowflake', border: 'solid-thick', firstAccent: false, invertHeader: true, invertAll: false },
+        { id: 'c13', cat: 'cold', label: "Taze Günlük Ürün", text: "GÜNLÜK TAZE ÜRÜN\n+4 °C'DE SAKLAYINIZ\nAYNI GÜN TÜKETİNİZ", icon: 'clock', border: 'solid-thin', firstAccent: false, invertHeader: true, invertAll: false },
+        { id: 'c14', cat: 'cold', label: "+15 / +22 °C Oda Sıcaklığı", text: "+15 °C / +22 °C\nODA SICAKLIĞINDA\nMUHAFAZA EDİNİZ", icon: 'thermometer', border: 'solid-thin', firstAccent: true, invertHeader: false, invertAll: false },
+        { id: 'c15', cat: 'cold', label: "Çikolata (+16 / +18 °C)", text: "ÇİKOLATA ÜRÜNÜ\n+16 / +18 °C SERİN\nORTAMDA SAKLAYINIZ", icon: 'thermometer', border: 'double', firstAccent: false, invertHeader: true, invertAll: false },
+        { id: 'c16', cat: 'cold', label: "Et / Tavuk (0 / +2 °C)", text: "TAZE ET / TAVUK\n0 / +2 °C'DE\nMUHAFAZA EDİNİZ", icon: 'snowflake', border: 'solid-thick', firstAccent: false, invertHeader: true, invertAll: false },
+        { id: 'c17', cat: 'cold', label: "Deniz Ürünü (0 / +2 °C)", text: "TAZE DENİZ ÜRÜNÜ\nBUZ ÜZERİNDE 0/+2 °C\nMUHAFAZA EDİNİZ", icon: 'snowflake', border: 'solid-thick', firstAccent: false, invertHeader: true, invertAll: false },
+        { id: 'c18', cat: 'cold', label: "Süt & Süt Ürünü", text: "SÜT VE SÜT ÜRÜNÜ\n+4 °C'DE SOĞUK\nMUHAFAZA EDİNİZ", icon: 'snowflake', border: 'solid-thin', firstAccent: false, invertHeader: true, invertAll: false },
+        { id: 'c19', cat: 'cold', label: "Buz Akülü Paket", text: "BUZ AKÜLÜ PAKET\nTESLİMATTA HEMEN\n+4 °C'YE ALINIZ", icon: 'snowflake', border: 'dashed', firstAccent: false, invertHeader: true, invertAll: false },
+        { id: 'c20', cat: 'cold', label: "Nem ve Isıdan Uzak", text: "ISI, IŞIK VE NEMDEN\nUZAK SERİN YERDE\nMUHAFAZA EDİNİZ", icon: 'umbrella', border: 'solid-thin', firstAccent: false, invertHeader: false, invertAll: false },
+        { id: 'c21', cat: 'cold', label: "Çözülme Başladı", text: "ÇÖZÜNDÜRME ETİKETİ\nBAŞLANGIÇ: __.__.2026\nSAAT: __:__ (+4 °C)", icon: 'clock', border: 'dashed', firstAccent: false, invertHeader: true, invertAll: false },
+        { id: 'c22', cat: 'cold', label: "Sıcak Servis (+65 °C)", text: "SICAK ÜRÜN!\n+65 °C VE ÜZERİNDE\nSERVİS EDİNİZ", icon: 'thermometer', border: 'solid-thick', firstAccent: true, invertHeader: false, invertAll: true },
 
-        // SEVKİYAT & KARGO
+        // ========================================================
+        // 2. MUTFAK, HAZIRLIK & HACCP (20 ŞABLON)
+        // ========================================================
+        { id: 'k1', cat: 'kitchen', label: "Açılmış Ürün (2 Gün)", text: "AÇILMIŞ ÜRÜN\nAÇILIŞ: __.__.2026\n2 GÜNDE TÜKETİNİZ", icon: 'clock', border: 'dashed', firstAccent: false, invertHeader: true, invertAll: false },
+        { id: 'k2', cat: 'kitchen', label: "Açılmış Ürün (3 Gün)", text: "AÇILMIŞ ÜRÜN\nAÇILIŞ: __.__.2026\n3 GÜNDE TÜKETİNİZ", icon: 'clock', border: 'dashed', firstAccent: false, invertHeader: true, invertAll: false },
+        { id: 'k3', cat: 'kitchen', label: "Mutfak Hazırlık", text: "MUTFAK HAZIRLIK\nHAZIRLAYAN: ________\nTARİH: __.__.2026", icon: 'none', border: 'solid-thin', firstAccent: false, invertHeader: true, invertAll: false },
+        { id: 'k4', cat: 'kitchen', label: "Şahit Numune (72 Saat)", text: "ŞAHİT NUMUNE\n72 SAAT +4 °C'DE\nSAKLANACAKTIR!", icon: 'warning', border: 'solid-thick', firstAccent: false, invertHeader: true, invertAll: false },
+        { id: 'k5', cat: 'kitchen', label: "Yıkanmış & Dezenfekte", text: "YIKANMIŞ & DEZENFEKTE\nEDİLMİŞTİR\nKULLANIMA HAZIR", icon: 'check', border: 'double', firstAccent: false, invertHeader: true, invertAll: false },
+        { id: 'k6', cat: 'kitchen', label: "Çiğ Ürün (Çapraz Bulaş)", text: "ÇİĞ ÜRÜN!\nPİŞMİŞ ÜRÜNLERDEN\nAYRI MUHAFAZA EDİNİZ", icon: 'warning', border: 'solid-thick', firstAccent: true, invertHeader: false, invertAll: true },
+        { id: 'k7', cat: 'kitchen', label: "Pişmiş Ürün", text: "PİŞMİŞ ÜRÜN\nSOĞUTMA TAMAMLANDI\n+4 °C'DE SAKLAYINIZ", icon: 'check', border: 'solid-thin', firstAccent: false, invertHeader: true, invertAll: false },
+        { id: 'k8', cat: 'kitchen', label: "Yarı Mamul", text: "YARI MAMUL ÜRÜN\nÜRT: __.__.2026\nSKT: __.__.2026", icon: 'none', border: 'solid-thin', firstAccent: false, invertHeader: true, invertAll: false },
+        { id: 'k9', cat: 'kitchen', label: "Marine Edilmiş Ürün", text: "MARİNE ÜRÜN\nBAŞLANGIÇ: __:__\n+4 °C'DE DİNLENDİRİNİZ", icon: 'clock', border: 'dashed', firstAccent: false, invertHeader: true, invertAll: false },
+        { id: 'k10', cat: 'kitchen', label: "Kullanmadan Önce Çalkala", text: "KULLANMADAN ÖNCE\nİYİCE\nÇALKALAYINIZ", icon: 'none', border: 'solid-thin', firstAccent: false, invertHeader: false, invertAll: false },
+        { id: 'k11', cat: 'kitchen', label: "Kullanmadan Önce Isıtınız", text: "SERVİSTEN ÖNCE\nMERKEZ +75 °C'YE\nKADAR ISITINIZ", icon: 'thermometer', border: 'solid-thin', firstAccent: false, invertHeader: true, invertAll: false },
+        { id: 'k12', cat: 'kitchen', label: "Personel Yemeği", text: "PERSONEL YEMEĞİ\nSATIŞA UYGUN DEĞİLDİR\nMUTFAK İÇİ KULLANIM", icon: 'none', border: 'dashed', firstAccent: false, invertHeader: true, invertAll: false },
+        { id: 'k13', cat: 'kitchen', label: "Tadım / Numune", text: "TADIM NUMUNESİ\nÜCRETSİZ NUMUNEDİR\nSATILAMAZ", icon: 'none', border: 'double', firstAccent: false, invertHeader: true, invertAll: false },
+        { id: 'k14', cat: 'kitchen', label: "Önce Bunu Kullan (Mutfak)", text: "ÖNCE BUNU KULLAN!\nAÇILMIŞ / YAKIN TARİHLİ\nÜRÜNDÜR", icon: 'warning', border: 'solid-thick', firstAccent: true, invertHeader: false, invertAll: true },
+        { id: 'k15', cat: 'kitchen', label: "Porsiyonlama Etiketi", text: "PORSİYON ÜRÜN\nAĞIRLIK: _____ GR\nTARİH: __.__.2026", icon: 'none', border: 'solid-thin', firstAccent: false, invertHeader: true, invertAll: false },
+        { id: 'k16', cat: 'kitchen', label: "Sos / Meze Hazırlık", text: "SOS / MEZE HAZIRLIK\nÜRT: __.__.2026\n+4 °C • 48 SAAT", icon: 'snowflake', border: 'solid-thin', firstAccent: false, invertHeader: true, invertAll: false },
+        { id: 'k17', cat: 'kitchen', label: "Pastane / Tatlı", text: "TAZE PASTANE ÜRÜNÜ\n+4 °C VİTRİNDE\nMUHAFAZA EDİNİZ", icon: 'snowflake', border: 'double', firstAccent: false, invertHeader: true, invertAll: false },
+        { id: 'k18', cat: 'kitchen', label: "Vakumlu Paket", text: "VAKUMLU PAKET\nAMBALAJI DELİNİRSE\nKULLANMAYINIZ", icon: 'warning', border: 'solid-thin', firstAccent: false, invertHeader: true, invertAll: false },
+        { id: 'k19', cat: 'kitchen', label: "Ağzını Sıkıca Kapatınız", text: "HER KULLANIMDAN SONRA\nKAPAĞINI SIKICA\nKAPATINIZ", icon: 'none', border: 'solid-thin', firstAccent: false, invertHeader: false, invertAll: false },
+        { id: 'k20', cat: 'kitchen', label: "Kimyasal / Gıda Dışı!", text: "DİKKAT! GIDA DEĞİLDİR\nTEMİZLİK KİMYASALI\nGIDALARDAN UZAK TUTUN", icon: 'warning', border: 'solid-thick', firstAccent: true, invertHeader: false, invertAll: true },
+
+        // ========================================================
+        // 3. ALERJEN & BESLENME / DİYET (16 ŞABLON)
+        // ========================================================
+        { id: 'a1', cat: 'allergen', label: "Genel Alerjen Uyarısı", text: "ALERJEN UYARISI\nSÜT, GLUTEN VE KURUYEMİŞ\nİÇEREBİLİR", icon: 'warning', border: 'double', firstAccent: false, invertHeader: true, invertAll: false },
+        { id: 'a2', cat: 'allergen', label: "Gluten İçerir", text: "ALERJEN UYARISI\nGLUTEN İÇERİR\n(BUĞDAY / ARPA / ÇAVDAR)", icon: 'warning', border: 'solid-thick', firstAccent: false, invertHeader: true, invertAll: false },
+        { id: 'a3', cat: 'allergen', label: "Glutensiz (Gluten-Free)", text: "GLUTENSİZ\n(GLUTEN-FREE)\nÇAPRAZ BULAŞTAN KORUN", icon: 'check', border: 'double', firstAccent: true, invertHeader: false, invertAll: false },
+        { id: 'a4', cat: 'allergen', label: "Süt & Laktoz İçerir", text: "ALERJEN UYARISI\nSÜT VE LAKTOZ\nİÇERİR", icon: 'warning', border: 'solid-thin', firstAccent: false, invertHeader: true, invertAll: false },
+        { id: 'a5', cat: 'allergen', label: "Laktozsuz Ürün", text: "LAKTOZSUZ ÜRÜN\n(LACTOSE-FREE)\n+4 °C'DE SAKLAYINIZ", icon: 'check', border: 'solid-thin', firstAccent: false, invertHeader: true, invertAll: false },
+        { id: 'a6', cat: 'allergen', label: "Kuruyemiş / Fıstık İçerir", text: "ALERJEN UYARISI!\nYER FISTIĞI VE SERT\nKABUKLU YEMİŞ İÇERİR", icon: 'warning', border: 'solid-thick', firstAccent: false, invertHeader: true, invertAll: false },
+        { id: 'a7', cat: 'allergen', label: "Yumurta İçerir", text: "ALERJEN UYARISI\nYUMURTA VE YUMURTA\nÜRÜNLERİ İÇERİR", icon: 'warning', border: 'solid-thin', firstAccent: false, invertHeader: true, invertAll: false },
+        { id: 'a8', cat: 'allergen', label: "Soya & Susam İçerir", text: "ALERJEN UYARISI\nSOYA VE SUSAM\nİÇERİR", icon: 'warning', border: 'solid-thin', firstAccent: false, invertHeader: true, invertAll: false },
+        { id: 'a9', cat: 'allergen', label: "Balık / Kabuklu Deniz", text: "ALERJEN UYARISI\nBALIK VE KABUKLU\nDENİZ ÜRÜNÜ İÇERİR", icon: 'warning', border: 'solid-thick', firstAccent: false, invertHeader: true, invertAll: false },
+        { id: 'a10', cat: 'allergen', label: "%100 Vegan Ürün", text: "%100 VEGAN\nHAYVANSAL ÜRÜN\nİÇERMEZ", icon: 'check', border: 'double', firstAccent: true, invertHeader: false, invertAll: false },
+        { id: 'a11', cat: 'allergen', label: "Vejetaryen Ürün", text: "VEJETARYEN ÜRÜN\nET VE ET ÜRÜNÜ\nİÇERMEZ", icon: 'check', border: 'solid-thin', firstAccent: false, invertHeader: true, invertAll: false },
+        { id: 'a12', cat: 'allergen', label: "Şeker İlavesiz", text: "ŞEKER İLAVESİZ\n(NO ADDED SUGAR)\nDOĞAL TATLANDIRICILI", icon: 'check', border: 'solid-thin', firstAccent: true, invertHeader: false, invertAll: false },
+        { id: 'a13', cat: 'allergen', label: "Koruyucu & Katkı İçermez", text: "%100 DOĞAL\nKORUYUCU VE KATKI\nMADDESİ İÇERMEZ", icon: 'check', border: 'double', firstAccent: false, invertHeader: true, invertAll: false },
+        { id: 'a14', cat: 'allergen', label: "Helal Sertifikalı", text: "HELAL KESİM\nDOMUZ ÜRÜNÜ VE ALKOL\nİÇERMEZ", icon: 'check', border: 'solid-thin', firstAccent: false, invertHeader: true, invertAll: false },
+        { id: 'a15', cat: 'allergen', label: "Acı Ürün Uyarısı", text: "DİKKAT! ACI ÜRÜN\nYÜKSEK ORANDA\nACI BİBER İÇERİR", icon: 'warning', border: 'solid-thick', firstAccent: true, invertHeader: false, invertAll: true },
+        { id: 'a16', cat: 'allergen', label: "Çekirdek Çıkabilir", text: "DİKKAT!\nDOĞAL ÜRÜNDÜR\nÇEKİRDEK ÇIKABİLİR", icon: 'warning', border: 'solid-thin', firstAccent: false, invertHeader: true, invertAll: false },
+
+        // ========================================================
+        // 4. SEVKİYAT, LOJİSTİK & KARGO (20 ŞABLON)
+        // ========================================================
         { id: 's1', cat: 'shipping', label: "Dikkat Kırılacak", text: "DİKKAT!\nKIRILACAK EŞYA\nHASSAS TAŞIYINIZ", icon: 'fragile', border: 'solid-thick', firstAccent: true, invertHeader: true, invertAll: false },
         { id: 's2', cat: 'shipping', label: "Bu Yüzü Yukarı", text: "BU YÜZÜ YUKARI\nDİK TAŞIYINIZ\nDEVİRMEYİNİZ", icon: 'up-arrows', border: 'solid-thick', firstAccent: false, invertHeader: true, invertAll: false },
         { id: 's3', cat: 'shipping', label: "Nemden Koruyunuz", text: "YAĞMURDAN VE NEMDEN\nKORUYUNUZ\nKURU TUTUNUZ", icon: 'umbrella', border: 'solid-thin', firstAccent: false, invertHeader: false, invertAll: false },
         { id: 's4', cat: 'shipping', label: "Acil Sevkiyat", text: "ACİL SEVKİYAT!\nÖNCELİKLİ TESLİMAT\nBEKLETMEYİNİZ", icon: 'clock', border: 'solid-thick', firstAccent: true, invertHeader: false, invertAll: true },
-        { id: 's5', cat: 'shipping', label: "Koli İçi / Koli No", text: "SEVKİYAT KOLİSİ\nKOLİ NO: ___ / ___\nŞUBE: ______________", icon: 'box', border: 'solid-thin', firstAccent: false, invertHeader: true, invertAll: false },
+        { id: 's5', cat: 'shipping', label: "Koli No / Şube", text: "SEVKİYAT KOLİSİ\nKOLİ NO: ___ / ___\nŞUBE: ______________", icon: 'box', border: 'solid-thin', firstAccent: false, invertHeader: true, invertAll: false },
+        { id: 's6', cat: 'shipping', label: "Üstüne Yük Koymayınız", text: "DİKKAT!\nÜSTÜNE AĞIR YÜK\nKOYMAYINIZ", icon: 'warning', border: 'solid-thick', firstAccent: true, invertHeader: false, invertAll: true },
+        { id: 's7', cat: 'shipping', label: "Falçata / Bıçakla Açma", text: "DİKKAT!\nKESİCİ ALET / FALÇATA\nİLE AÇMAYINIZ", icon: 'warning', border: 'solid-thick', firstAccent: false, invertHeader: true, invertAll: false },
+        { id: 's8', cat: 'shipping', label: "Sıvı Ürün / Dik Tutunuz", text: "SIVI ÜRÜN!\nDÖKÜLEBİLİR\nDİK TAŞIYINIZ", icon: 'up-arrows', border: 'solid-thick', firstAccent: true, invertHeader: false, invertAll: false },
+        { id: 's9', cat: 'shipping', label: "Ağır Koli (2 Kişi)", text: "AĞIR KOLİ!\nDİKKATLİ KALDIRINIZ\n(+20 KG)", icon: 'warning', border: 'solid-thick', firstAccent: false, invertHeader: true, invertAll: false },
+        { id: 's10', cat: 'shipping', label: "Fatura / İrsaliye İçinde", text: "FATURA / İRSALİYE\nBU KOLİNİN\nİÇİNDEDİR", icon: 'box', border: 'double', firstAccent: false, invertHeader: true, invertAll: false },
+        { id: 's11', cat: 'shipping', label: "Kurye / Paket Servis", text: "PAKET SERVİS\nSİPARİŞ NO: #_____\nAFİYET OLSUN", icon: 'box', border: 'solid-thin', firstAccent: false, invertHeader: true, invertAll: false },
+        { id: 's12', cat: 'shipping', label: "Güvenlik Mühür Bandı", text: "GÜVENLİK MÜHRÜ\nBANDI AÇILMIŞ PAKETİ\nTESLİM ALMAYINIZ", icon: 'check', border: 'solid-thick', firstAccent: false, invertHeader: true, invertAll: false },
+        { id: 's13', cat: 'shipping', label: "Aynı Gün Kargo", text: "AYNI GÜN TESLİMAT\nÖNCELİKLİ KARGO\nBEKLETMEYİNİZ", icon: 'clock', border: 'solid-thick', firstAccent: false, invertHeader: true, invertAll: false },
+        { id: 's14', cat: 'shipping', label: "Çoklu Paket (Parça)", text: "PARÇALI GÖNDERİ\nPARÇA: ___ / ___\nAYIRMAYINIZ!", icon: 'box', border: 'solid-thick', firstAccent: false, invertHeader: true, invertAll: false },
+        { id: 's15', cat: 'shipping', label: "Soğuk Kargo (Frigo)", text: "FRİGOFİRİK SEVKİYAT\n+4 °C SOĞUK ARAÇ İLE\nTAŞINACAKTIR", icon: 'snowflake', border: 'solid-thick', firstAccent: false, invertHeader: true, invertAll: false },
+        { id: 's16', cat: 'shipping', label: "Alıcı / Telefon Etiketi", text: "ALICI: ______________\nTEL: 05__ ___ __ __\nADRES: ______________", icon: 'none', border: 'solid-thin', firstAccent: false, invertHeader: false, invertAll: false },
+        { id: 's17', cat: 'shipping', label: "Şube Transferi", text: "ŞUBELER ARASI TRANSFER\nÇIKIŞ: _____________\nVARIŞ: _____________", icon: 'box', border: 'solid-thin', firstAccent: false, invertHeader: true, invertAll: false },
+        { id: 's18', cat: 'shipping', label: "Kargo Hasar Uyarısı", text: "DİKKAT! HASARLI KOLİYİ\nTUTANAK TUTTURMADAN\nTESLİM ALMAYINIZ", icon: 'warning', border: 'double', firstAccent: false, invertHeader: true, invertAll: false },
+        { id: 's19', cat: 'shipping', label: "Cam Şişe / Kavanoz", text: "CAM AMBALAJ!\nDARBEDEN KORUYUNUZ\nYAVAŞ BIRAKINIZ", icon: 'fragile', border: 'solid-thick', firstAccent: true, invertHeader: false, invertAll: false },
+        { id: 's20', cat: 'shipping', label: "Müşteri Teslim (Mağaza)", text: "MAĞAZADAN TESLİM\nMÜŞTERİ: ____________\nÖDEME: ALINDI / KAPIDA", icon: 'check', border: 'solid-thin', firstAccent: false, invertHeader: true, invertAll: false },
 
-        // DEPO & RAF
+        // ========================================================
+        // 5. DEPO, RAF & KALİTE KONTROL (20 ŞABLON)
+        // ========================================================
         { id: 'w1', cat: 'warehouse', label: "Kalite Onaylı", text: "KALİTE KONTROL\nONAYLANDI\nSEVKİYATA UYGUN", icon: 'check', border: 'double', firstAccent: false, invertHeader: true, invertAll: false },
         { id: 'w2', cat: 'warehouse', label: "Karantina / Beklemede", text: "KARANTİNA!\nKULLANMAYINIZ\nONAY BEKLİYOR", icon: 'warning', border: 'solid-thick', firstAccent: true, invertHeader: false, invertAll: true },
-        { id: 'w3', cat: 'warehouse', label: "İlk Giren İlk Çıkar", text: "FIFO KURALI\nÖNCE BU ÜRÜNÜ\nKULLANINIZ", icon: 'clock', border: 'dashed', firstAccent: true, invertHeader: true, invertAll: false },
-        { id: 'w4', cat: 'warehouse', label: "Açılmış Paket", text: "AÇILMIŞ ÜRÜN\nAÇILIŞ: __.__.2026\nÖNCELİKLİ TÜKETİNİZ", icon: 'none', border: 'dashed', firstAccent: false, invertHeader: true, invertAll: false }
+        { id: 'w3', cat: 'warehouse', label: "FIFO (İlk Giren İlk Çıkar)", text: "FIFO KURALI\nÖNCE BU ÜRÜNÜ\nKULLANINIZ", icon: 'clock', border: 'dashed', firstAccent: true, invertHeader: true, invertAll: false },
+        { id: 'w4', cat: 'warehouse', label: "FEFO (Yakın SKT Önce)", text: "FEFO KURALI\nSKT'Sİ EN YAKIN ÜRÜN\nÖNCE SEVK EDİNİZ", icon: 'clock', border: 'solid-thick', firstAccent: false, invertHeader: true, invertAll: false },
+        { id: 'w5', cat: 'warehouse', label: "Red / Uygunsuz Ürün", text: "RED! UYGUNSUZ ÜRÜN\nSEVK ETMEYİNİZ\nKALİTEYE BİLDİRİNİZ", icon: 'warning', border: 'solid-thick', firstAccent: true, invertHeader: false, invertAll: true },
+        { id: 'w6', cat: 'warehouse', label: "İmha / Zayi Ürün", text: "İMHA EDİLECEK!\nSKT DOLMUŞ / BOZUK\nKULLANILAMAZ", icon: 'warning', border: 'solid-thick', firstAccent: false, invertHeader: false, invertAll: true },
+        { id: 'w7', cat: 'warehouse', label: "Sayım Yapıldı", text: "STOK SAYIMI YAPILDI\nADET: _____  TARİH: __.__\nSORUMLU: ___________", icon: 'check', border: 'solid-thin', firstAccent: false, invertHeader: true, invertAll: false },
+        { id: 'w8', cat: 'warehouse', label: "Mal Kabul Yapıldı", text: "MAL KABUL ONAYLI\nGİRİŞ: __.__.2026\nDEPOYA ALINABİLİR", icon: 'check', border: 'solid-thin', firstAccent: false, invertHeader: true, invertAll: false },
+        { id: 'w9', cat: 'warehouse', label: "Raf Adres Etiketi", text: "KORİDOR: A  •  RAF: 01\nGÖZ: 04  •  KAT: 2", icon: 'none', border: 'solid-thick', firstAccent: true, invertHeader: false, invertAll: false },
+        { id: 'w10', cat: 'warehouse', label: "Palet Etiketi", text: "PALET NO: #_____\nKOLİ ADEDİ: _____\nÜRÜN: ______________", icon: 'box', border: 'solid-thick', firstAccent: false, invertHeader: true, invertAll: false },
+        { id: 'w11', cat: 'warehouse', label: "Kritik Stok Seviyesi", text: "KRİTİK STOK!\nBU ETİKETE GELİNCE\nSİPARİŞ VERİNİZ", icon: 'warning', border: 'dashed', firstAccent: true, invertHeader: true, invertAll: false },
+        { id: 'w12', cat: 'warehouse', label: "Yarım Koli / Açık Koli", text: "YARIM KOLİ!\nİÇİNDEKİ ADET: _____\nÖNCE BURADAN ALINIZ", icon: 'box', border: 'dashed', firstAccent: false, invertHeader: true, invertAll: false },
+        { id: 'w13', cat: 'warehouse', label: "Rezerve Edildi", text: "REZERVE ÜRÜN!\nDOKUNMAYINIZ\nAYIRAN: ____________", icon: 'warning', border: 'solid-thick', firstAccent: false, invertHeader: true, invertAll: false },
+        { id: 'w14', cat: 'warehouse', label: "İade Alınan Ürün", text: "MÜŞTERİ İADESİ\nKONTROL EDİLECEK\nSTOĞA KARIŞTIRMAYIN", icon: 'warning', border: 'dashed', firstAccent: false, invertHeader: true, invertAll: false },
+        { id: 'w15', cat: 'warehouse', label: "Tedarikçiye İade", text: "TEDARİKÇİYE İADE\nFİRMA: _____________\nSEBEP: _____________", icon: 'box', border: 'solid-thin', firstAccent: false, invertHeader: true, invertAll: false },
+        { id: 'w16', cat: 'warehouse', label: "Bakım / Arızalı Cihaz", text: "ARIZALI! KULLANMAYIN\nSERVİS BEKLİYOR\nTARİH: __.__.2026", icon: 'warning', border: 'solid-thick', firstAccent: true, invertHeader: false, invertAll: true },
+        { id: 'w17', cat: 'warehouse', label: "Demirbaş Etiketi", text: "ŞİRKET DEMİRBAŞI\nDEMİRBAŞ NO: ________\nBÖLÜM: _____________", icon: 'none', border: 'double', firstAccent: false, invertHeader: true, invertAll: false },
+        { id: 'w18', cat: 'warehouse', label: "Arşiv Klasör Etiketi", text: "ARŞİV KLASÖRÜ\nYIL: 2026  •  AY: ____\nİÇERİK: ____________", icon: 'none', border: 'solid-thin', firstAccent: false, invertHeader: true, invertAll: false },
+        { id: 'w19', cat: 'warehouse', label: "Özel Sipariş / Ayrıldı", text: "ÖZEL SİPARİŞ\nMÜŞTERİ İÇİN AYRILDI\nSATIŞA ÇIKARMAYINIZ", icon: 'check', border: 'solid-thick', firstAccent: false, invertHeader: true, invertAll: false },
+        { id: 'w20', cat: 'warehouse', label: "Hammadde Giriş", text: "HAMMADDE STOK\nLOT: ______________\nGİRİŞ: __.__.2026", icon: 'box', border: 'solid-thin', firstAccent: false, invertHeader: true, invertAll: false },
+
+        // ========================================================
+        // 6. MAĞAZA, FİYAT, KAMPANYA & GENEL (16 ŞABLON)
+        // ========================================================
+        { id: 'r1', cat: 'retail', label: "İndirim / Kampanya", text: "ÖZEL KAMPANYA!\nFIRSAT ÜRÜNÜ\nSINIRLI STOK", icon: 'none', border: 'solid-thick', firstAccent: true, invertHeader: false, invertAll: true },
+        { id: 'r2', cat: 'retail', label: "%20 İndirim", text: "%20 İNDİRİM!\nKASA FİYATINDAN\nDÜŞÜLECEKTİR", icon: 'none', border: 'solid-thick', firstAccent: true, invertHeader: true, invertAll: false },
+        { id: 'r3', cat: 'retail', label: "%50 İndirim (Yakın SKT)", text: "%50 İNDİRİM!\nYAKIN SKT FIRSATI\nİSRAFI ÖNLEYELİM", icon: 'clock', border: 'solid-thick', firstAccent: true, invertHeader: true, invertAll: false },
+        { id: 'r4', cat: 'retail', label: "Yeni Ürün!", text: "YENİ ÜRÜN!\nMUTLAKA DENEYİNİZ\nTAZE GELDİ", icon: 'check', border: 'double', firstAccent: true, invertHeader: true, invertAll: false },
+        { id: 'r5', cat: 'retail', label: "Hediye Paketidir", text: "HEDİYE PAKETİ\nFİYAT ETİKETİ\nÇIKARILMIŞTIR", icon: 'box', border: 'double', firstAccent: false, invertHeader: false, invertAll: false },
+        { id: 'r6', cat: 'retail', label: "Teşhir Ürünü", text: "TEŞHİR ÜRÜNÜDÜR\nSATIŞA UYGUN\nDEĞİLDİR", icon: 'none', border: 'dashed', firstAccent: false, invertHeader: true, invertAll: false },
+        { id: 'r7', cat: 'retail', label: "Set / Çoklu Paket", text: "SET ÜRÜNDÜR!\nPARÇALARI AYRI\nSATILAMAZ", icon: 'box', border: 'solid-thick', firstAccent: false, invertHeader: true, invertAll: false },
+        { id: 'r8', cat: 'retail', label: "Ödendi / Kasa Onaylı", text: "ÖDEMESİ YAPILDI\nKASA ONAYLI\nTEŞEKKÜR EDERİZ", icon: 'check', border: 'double', firstAccent: false, invertHeader: true, invertAll: false },
+        { id: 'r9', cat: 'retail', label: "Fiyat Etiketi (Boş)", text: "ÜRÜN ADI\nFİYAT: _____ TL\nKDV DAHİLDİR", icon: 'none', border: 'solid-thick', firstAccent: false, invertHeader: true, invertAll: false },
+        { id: 'r10', cat: 'retail', label: "Yerli Üretim", text: "YERLİ ÜRETİM\nTÜRKİYE'DE\nÜRETİLMİŞTİR", icon: 'check', border: 'solid-thin', firstAccent: true, invertHeader: false, invertAll: false },
+        { id: 'r11', cat: 'retail', label: "El Yapımı / Artizan", text: "EL YAPIMI ÜRÜN\nKATKISIZ & ÖZEL\nREÇETE", icon: 'none', border: 'double', firstAccent: true, invertHeader: false, invertAll: false },
+        { id: 'r12', cat: 'retail', label: "Teşekkür Ederiz", text: "BİZİ TERCİH ETTİĞİNİZ\nİÇİN TEŞEKKÜR EDERİZ\nAFİYET OLSUN!", icon: 'check', border: 'solid-thin', firstAccent: false, invertHeader: false, invertAll: false },
+        { id: 'r13', cat: 'retail', label: "1 Alana 1 Bedava", text: "1 ALANA\n1 BEDAVA!\nKAMPANYALI ÜRÜN", icon: 'none', border: 'solid-thick', firstAccent: true, invertHeader: false, invertAll: true },
+        { id: 'r14', cat: 'retail', label: "Geri Dönüşümlü Ambalaj", text: "ÇEVRE DOSTU AMBALAJ\nLÜTFEN GERİ DÖNÜŞÜM\nKUTUSUNA ATINIZ", icon: 'check', border: 'solid-thin', firstAccent: false, invertHeader: true, invertAll: false },
+        { id: 'r15', cat: 'retail', label: "Şefin Önerisi", text: "ŞEFİN ÖNERİSİ\nÖZEL SEÇİM ÜRÜN\nTAZE HAZIRLANDI", icon: 'check', border: 'double', firstAccent: true, invertHeader: true, invertAll: false },
+        { id: 'r16', cat: 'retail', label: "Son Ürün / Son Adet", text: "SON ADET!\nTÜKENMEK ÜZERE\nKAÇIRMAYINIZ", icon: 'clock', border: 'solid-thick', firstAccent: true, invertHeader: false, invertAll: true }
       ];
-
-      // Örnek Excel Ürünleri
-      const SAMPLE_ITEMS = [
-        { name: 'SALÇA DOMATES', code: '02.01.01.0002', barcode: '2010100020004' },
-        { name: 'SALÇA BİBER', code: '02.01.01.0001', barcode: '2010100010005' },
-        { name: 'ADAÇAYI', code: '02.02.03.0001', barcode: '2020300010002' },
-        { name: 'KAYNAK TCHIBO FİLTRE KAHVE BRAZİL MİLD 250 GR', code: '02.02.04.0005', barcode: '4046234659740' },
-        { name: 'PEYNİR BEYAZ TAM YAĞLI (SÜTAŞ)', code: '02.07.01.0006', barcode: '2070100060004' },
-        { name: 'ZEYTİN YEŞİL ÇEKİRDEKSİZ', code: '02.08.01.0004', barcode: '2080100040005' }
-      ];
-
-      // ==========================================================
-      // 2. YARDIMCI FONKSİYONLAR
-      // ==========================================================
-      function turkishUpper(str) {
-        return String(str || '').replace(/i/g, 'İ').replace(/ı/g, 'I').toUpperCase();
-      }
-
-      const TR_ALPHABET = " -./()0123456789ABCÇDEFGĞHIİJKLMNOÖPQRSŞTUÜVWXYZ";
-      const TR_MAP = {};
-      for (let i = 0; i < TR_ALPHABET.length; i++) TR_MAP[TR_ALPHABET[i]] = i;
-
-      function turkishCompare(a, b) {
-        const s1 = turkishUpper(a).trim().replace(/^[*.\-_\s]+/, '');
-        const s2 = turkishUpper(b).trim().replace(/^[*.\-_\s]+/, '');
-        const len = Math.min(s1.length, s2.length);
-        for (let i = 0; i < len; i++) {
-          const v1 = TR_MAP[s1[i]] !== undefined ? TR_MAP[s1[i]] : 1000 + s1.charCodeAt(i);
-          const v2 = TR_MAP[s2[i]] !== undefined ? TR_MAP[s2[i]] : 1000 + s2.charCodeAt(i);
-          if (v1 !== v2) return v1 - v2;
-        }
-        return s1.length - s2.length;
-      }
-
-      function escapeHtml(str) {
-        return String(str)
-          .replace(/&/g, '&amp;')
-          .replace(/</g, '&lt;')
-          .replace(/>/g, '&gt;')
-          .replace(/"/g, '&quot;');
-      }
-
-      function formatDateTR(isoDateStr) {
-        if (!isoDateStr) return '__.__.____';
-        const parts = isoDateStr.split('-');
-        if (parts.length !== 3) return isoDateStr;
-        return `${parts[2]}.${parts[1]}.${parts[0]}`;
-      }
-
-      function getTodayISO(offsetDays = 0) {
-        const d = new Date();
-        d.setDate(d.getDate() + offsetDays);
-        const y = d.getFullYear();
-        const m = String(d.getMonth() + 1).padStart(2, '0');
-        const day = String(d.getDate()).padStart(2, '0');
-        return `${y}-${m}-${day}`;
-      }
-
-      function showToast(message, type = 'info') {
-        const container = document.getElementById('toast-container');
-        const toast = document.createElement('div');
-        const colors = {
-          info: 'bg-slate-900 text-white',
-          success: 'bg-emerald-700 text-white',
-          error: 'bg-rose-600 text-white'
-        };
-        toast.className = `${colors[type] || colors.info} text-xs font-bold px-4 py-3 rounded-xl shadow-lg pointer-events-auto transition-all duration-300 transform translate-y-2 opacity-0`;
-        toast.textContent = message;
-        container.appendChild(toast);
-        requestAnimationFrame(() => toast.classList.remove('translate-y-2', 'opacity-0'));
-        setTimeout(() => {
-          toast.classList.add('opacity-0', 'translate-y-2');
-          setTimeout(() => toast.remove(), 300);
-        }, 3200);
-      }
-
-      // Termal Siyah/Beyaz Vektör İkonlar
-      function getThermalIconSVG(iconKey, sizeMm = 5.5, color = '#000000') {
-        const style = `width:${sizeMm}mm;height:${sizeMm}mm;display:block;flex-shrink:0;`;
-        const icons = {
-          snowflake: `<svg style="${style}" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="2" x2="12" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/><line x1="19.07" y1="4.93" x2="4.93" y2="19.07"/><polyline points="9 5 12 8 15 5"/><polyline points="9 19 12 16 15 19"/><polyline points="5 9 8 12 5 15"/><polyline points="19 9 16 12 19 15"/></svg>`,
-          warning: `<svg style="${style}" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>`,
-          thermometer: `<svg style="${style}" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 14.76V3.5a2.5 2.5 0 00-5 0v11.26a4.5 4.5 0 105 0z"/></svg>`,
-          fragile: `<svg style="${style}" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 22h8M12 15v7M6 3h12l-1 7a5 5 0 01-10 0L6 3z"/><path d="M11 3l2 4-2 2"/></svg>`,
-          umbrella: `<svg style="${style}" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 12a11.05 11.05 0 00-22 0zm-5 7a3 3 0 01-6 0v-7"/></svg>`,
-          'up-arrows': `<svg style="${style}" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="18" x2="7" y2="5"/><polyline points="3 9 7 5 11 9"/><line x1="17" y1="18" x2="17" y2="5"/><polyline points="13 9 17 5 21 9"/><line x1="3" y1="21" x2="21" y2="21"/></svg>`,
-          clock: `<svg style="${style}" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`,
-          box: `<svg style="${style}" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>`,
-          check: `<svg style="${style}" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>`
-        };
-        return icons[iconKey] || '';
-      }
-
-      // QR Kod Canvas Elemanı Üretici (PDF ve Print ile %100 uyumlu)
-      function createQRCodeElement(text, sizePx = 88) {
-        const holder = document.createElement('div');
-        holder.style.display = 'inline-flex';
-        holder.style.alignItems = 'center';
-        holder.style.justifyContent = 'center';
-        holder.style.background = '#ffffff';
-        holder.style.padding = '1mm';
-        try {
-          new QRCode(holder, {
-            text: String(text || ' '),
-            width: sizePx,
-            height: sizePx,
-            colorDark: '#000000',
-            colorLight: '#ffffff',
-            correctLevel: QRCode.CorrectLevel.M
-          });
-          // QRCode.js hem canvas hem img üretir; canvas'ı tutup img'yi gizlemek html2canvas için daha temiz
-          const img = holder.querySelector('img');
-          const cvs = holder.querySelector('canvas');
-          if (cvs && img) {
-            img.style.display = 'none';
-            cvs.style.display = 'block';
-            cvs.style.width = '100%';
-            cvs.style.height = '100%';
-          }
-        } catch (e) {
-          holder.textContent = 'QR Hata';
-        }
-        return holder;
-      }
-
-      // ==========================================================
-      // 3. ETİKET ÖLÇÜSÜ VE @PAGE YÖNETİMİ
-      // ==========================================================
-      function updateLabelDimensions(w, h) {
-        state.labelW = Math.max(20, Math.min(210, Number(w) || 70));
-        state.labelH = Math.max(15, Math.min(297, Number(h) || 44));
-
-        document.documentElement.style.setProperty('--label-w', state.labelW + 'mm');
-        document.documentElement.style.setProperty('--label-h', state.labelH + 'mm');
-
-        const pageStyle = document.getElementById('dynamic-page-style');
-        // NOT: @page kuralı içinde !important kullanılmaz, aksi halde Chrome ölçüyü ve margin:0 kuralını yok sayar
-        pageStyle.textContent = `@page { size: ${state.labelW}mm ${state.labelH}mm; margin: 0; }`;
-
-        document.getElementById('preview-dim-text').textContent = `${state.labelW} × ${state.labelH} mm • Birebir Oran`;
-        document.getElementById('tip-size-span').textContent = `${state.labelW} × ${state.labelH} mm`;
-
-        try {
-          localStorage.setItem('tac_label_dims_v2', JSON.stringify({ w: state.labelW, h: state.labelH }));
-        } catch (e) {}
-
-        renderLivePreview();
-      }
-
-      // ==========================================================
-      // 4. ETİKET OLUŞTURUCU MOTORLAR (BARKOD, METİN, ÜRT/SKT)
-      // ==========================================================
-
-      // A) Barkodlu Ürün Etiketi Oluşturucu
-      function getBarcodeSettings() {
-        return {
-          format: document.getElementById('bc-format').value,
-          align: document.getElementById('bc-align').value,
-          fontFamily: document.getElementById('bc-font-family').value,
-          prefix: document.getElementById('bc-code-prefix').value,
-          border: document.getElementById('bc-border').value,
-          bcHeightMm: parseFloat(document.getElementById('bc-height').value) || 13.5,
-          fontScale: (parseFloat(document.getElementById('bc-font-scale').value) || 100) / 100,
-          extraNote: document.getElementById('bc-extra-note').value.trim(),
-          useUpper: document.getElementById('bc-uppercase').checked,
-          showCode: document.getElementById('bc-show-code').checked,
-          showVal: document.getElementById('bc-show-value').checked
-        };
-      }
-
-      function createBarcodeLabelElement(item, customSettings = null) {
-        const s = customSettings || getBarcodeSettings();
-        const widthRatio = state.labelW / 70;
-
-        const label = document.createElement('div');
-        label.className = 'thermal-label';
-        label.style.fontFamily = s.fontFamily;
-        label.style.padding = s.border === 'none' ? '2mm 2.8mm' : '1.6mm';
-
-        const inner = document.createElement('div');
-        inner.style.width = '100%';
-        inner.style.height = '100%';
-        inner.style.display = 'flex';
-        inner.style.flexDirection = 'column';
-        inner.style.justifyContent = 'space-between';
-        inner.style.alignItems = 'center';
-        inner.style.boxSizing = 'border-box';
-        inner.style.padding = s.border === 'none' ? '0' : '1.4mm 2mm';
-
-        if (s.border === 'thin') {
-          inner.style.border = '0.5mm solid #000000';
-          inner.style.borderRadius = '1.2mm';
-        } else if (s.border === 'thick') {
-          inner.style.border = '1.1mm solid #000000';
-          inner.style.borderRadius = '1.8mm';
-        }
-
-        const displayName = s.useUpper ? turkishUpper(item.name) : String(item.name || '');
-        const len = displayName.length;
-        const isQR = s.format === 'QR';
-        const isNone = s.format === 'NONE';
-
-        // Akıllı Punto
-        let basePt = 13;
-        if (isNone) {
-          basePt = len <= 14 ? 20 : len <= 26 ? 16 : len <= 40 ? 13 : 10.5;
-        } else if (isQR) {
-          basePt = len <= 16 ? 12.5 : len <= 28 ? 10.5 : 8.8;
-        } else {
-          basePt = len <= 16 ? 13.5 : len <= 26 ? 11.4 : len <= 38 ? 9.6 : 8.4;
-        }
-        const finalPt = Math.max(6.5, basePt * s.fontScale * widthRatio);
-
-        // QR Kod Modu için Yan Yana veya Üst-Alt Yerleşim
-        if (isQR) {
-          const row = document.createElement('div');
-          row.style.display = 'flex';
-          row.style.width = '100%';
-          row.style.flex = '1';
-          row.style.alignItems = 'center';
-          row.style.justifyContent = 'space-between';
-          row.style.gap = '2mm';
-
-          const leftCol = document.createElement('div');
-          leftCol.style.flex = '1';
-          leftCol.style.textAlign = s.align;
-          leftCol.style.display = 'flex';
-          leftCol.style.flexDirection = 'column';
-          leftCol.style.justifyContent = 'center';
-
-          const tEl = document.createElement('div');
-          tEl.className = 'h2c-text';
-          tEl.textContent = displayName || 'ÜRÜN ADI';
-          tEl.style.fontWeight = '900';
-          tEl.style.fontSize = `${finalPt.toFixed(1)}pt`;
-          tEl.style.lineHeight = '1.16';
-          tEl.style.wordBreak = 'break-word';
-          leftCol.appendChild(tEl);
-
-          if (s.showCode && item.code) {
-            const cEl = document.createElement('div');
-            cEl.className = 'h2c-text';
-            cEl.textContent = `${s.prefix}${item.code}`;
-            cEl.style.fontWeight = '800';
-            cEl.style.fontSize = `${(8.5 * widthRatio).toFixed(1)}pt`;
-            cEl.style.marginTop = '1.2mm';
-            leftCol.appendChild(cEl);
-          }
-
-          if (s.showVal && item.barcode) {
-            const vEl = document.createElement('div');
-            vEl.className = 'h2c-text';
-            vEl.textContent = item.barcode;
-            vEl.style.fontWeight = '700';
-            vEl.style.fontSize = `${(7.8 * widthRatio).toFixed(1)}pt`;
-            vEl.style.marginTop = '0.6mm';
-            leftCol.appendChild(vEl);
-          }
-
-          const qrSizeMm = Math.min(state.labelH - 8, 22);
-          const qrWrap = createQRCodeElement(item.barcode || item.code || item.name, 120);
-          qrWrap.style.width = `${qrSizeMm}mm`;
-          qrWrap.style.height = `${qrSizeMm}mm`;
-          qrWrap.style.flexShrink = '0';
-
-          row.appendChild(leftCol);
-          row.appendChild(qrWrap);
-          inner.appendChild(row);
-        } else {
-          // Standart Barkod veya Barkodsuz Düzen
-          const headerDiv = document.createElement('div');
-          headerDiv.style.width = '100%';
-          headerDiv.style.display = 'flex';
-          headerDiv.style.flexDirection = 'column';
-          headerDiv.style.alignItems = s.align === 'center' ? 'center' : 'flex-start';
-          headerDiv.style.justifyContent = 'center';
-          headerDiv.style.textAlign = s.align;
-          headerDiv.style.flex = '1 1 auto';
-          headerDiv.style.minHeight = '0';
-
-          const titleEl = document.createElement('div');
-          titleEl.className = 'h2c-text';
-          titleEl.textContent = displayName || 'ÜRÜN ADI';
-          titleEl.style.fontWeight = '900';
-          titleEl.style.fontSize = `${finalPt.toFixed(1)}pt`;
-          titleEl.style.lineHeight = '1.16';
-          titleEl.style.width = '100%';
-          titleEl.style.wordBreak = 'break-word';
-          headerDiv.appendChild(titleEl);
-
-          if (s.showCode && item.code) {
-            const codeEl = document.createElement('div');
-            codeEl.className = 'h2c-text';
-            codeEl.textContent = `${s.prefix}${item.code}`;
-            codeEl.style.fontWeight = '800';
-            codeEl.style.fontSize = `${(8.8 * widthRatio).toFixed(1)}pt`;
-            codeEl.style.marginTop = '0.8mm';
-            headerDiv.appendChild(codeEl);
-          }
-
-          inner.appendChild(headerDiv);
-
-          if (!isNone) {
-            const bcWrap = document.createElement('div');
-            bcWrap.style.width = '100%';
-            bcWrap.style.display = 'flex';
-            bcWrap.style.flexDirection = 'column';
-            bcWrap.style.alignItems = 'center';
-            bcWrap.style.flexShrink = '0';
-            bcWrap.style.marginTop = '0.8mm';
-
-            const barcodeText = String(item.barcode || '').trim();
-            if (barcodeText) {
-              const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-              svg.style.height = `${s.bcHeightMm}mm`;
-              svg.style.width = '88%';
-              svg.style.display = 'block';
-              try {
-                JsBarcode(svg, barcodeText, {
-                  format: s.format,
-                  lineColor: '#000000',
-                  background: '#ffffff',
-                  width: 2,
-                  height: 60,
-                  displayValue: false,
-                  margin: 0
-                });
-                svg.setAttribute('preserveAspectRatio', 'none');
-                bcWrap.appendChild(svg);
-              } catch (err) {
-                const errEl = document.createElement('div');
-                errEl.textContent = `Geçersiz ${s.format}: ${barcodeText}`;
-                errEl.style.fontSize = '7pt';
-                errEl.style.fontWeight = '700';
-                errEl.style.color = '#dc2626';
-                bcWrap.appendChild(errEl);
-              }
-            }
-
-            if (s.showVal && barcodeText) {
-              const valEl = document.createElement('div');
-              valEl.className = 'h2c-text';
-              valEl.textContent = barcodeText;
-              valEl.style.fontWeight = '800';
-              valEl.style.fontSize = `${(9 * widthRatio).toFixed(1)}pt`;
-              valEl.style.letterSpacing = '0.04em';
-              valEl.style.marginTop = '0.7mm';
-              bcWrap.appendChild(valEl);
-            }
-            inner.appendChild(bcWrap);
-          }
-        }
-
-        // Ek Alt Not Şeridi (Opsiyonel)
-        if (s.extraNote) {
-          const noteEl = document.createElement('div');
-          noteEl.style.width = '100%';
-          noteEl.style.display = 'flex';
-          noteEl.style.alignItems = 'center';
-          noteEl.style.justifyContent = 'center';
-          noteEl.style.background = '#000000';
-          noteEl.style.color = '#ffffff';
-          noteEl.style.padding = '0.7mm 1.2mm';
-          noteEl.style.marginTop = '0.8mm';
-          noteEl.style.borderRadius = '0.6mm';
-          const noteSpan = document.createElement('span');
-          noteSpan.className = 'h2c-text';
-          noteSpan.textContent = s.useUpper ? turkishUpper(s.extraNote) : s.extraNote;
-          noteSpan.style.fontSize = `${(6.8 * widthRatio).toFixed(1)}pt`;
-          noteSpan.style.fontWeight = '800';
-          noteSpan.style.lineHeight = '1.15';
-          noteEl.appendChild(noteSpan);
-          inner.appendChild(noteEl);
-        }
-
-        label.appendChild(inner);
-        return label;
-      }
-
-      // B) Serbest Yazı & Uyarı Etiketi Oluşturucu
-      function getFreeTextSettings() {
-        return {
-          rawText: document.getElementById('free-text-input').value,
-          useUpper: document.getElementById('txt-uppercase').checked,
-          autoFit: document.getElementById('txt-autofit').checked,
-          manualPt: parseFloat(document.getElementById('txt-size').value) || 24,
-          lineHeight: parseFloat(document.getElementById('txt-leading').value) || 1.12,
-          fontFamily: document.getElementById('txt-font-family').value,
-          align: document.getElementById('txt-align').value,
-          borderType: document.getElementById('txt-border').value,
-          iconType: document.getElementById('txt-icon').value,
-          firstAccent: document.getElementById('txt-first-accent').checked,
-          invertHeader: document.getElementById('txt-invert-header').checked,
-          invertAll: document.getElementById('txt-invert-all').checked,
-          addCode: document.getElementById('txt-add-code').checked,
-          codeType: document.getElementById('txt-code-type').value,
-          codeVal: document.getElementById('txt-code-val').value.trim()
-        };
-      }
-
-      function createFreeTextLabelElement(customSettings = null) {
-        const s = customSettings || getFreeTextSettings();
-        const fg = s.invertAll ? '#ffffff' : '#000000';
-        const bg = s.invertAll ? '#000000' : '#ffffff';
-
-        const label = document.createElement('div');
-        label.className = 'thermal-label';
-        label.style.fontFamily = s.fontFamily;
-        label.style.background = bg;
-        label.style.color = fg;
-        label.style.padding = '2mm';
-
-        const inner = document.createElement('div');
-        inner.style.width = '100%';
-        inner.style.height = '100%';
-        inner.style.display = 'flex';
-        inner.style.flexDirection = 'column';
-        inner.style.justifyContent = 'center';
-        inner.style.alignItems = s.align === 'center' ? 'center' : s.align === 'left' ? 'flex-start' : 'flex-end';
-        inner.style.textAlign = s.align;
-        inner.style.padding = s.borderType === 'none' ? '0.5mm 1mm' : '1.6mm 2mm';
-        inner.style.boxSizing = 'border-box';
-        inner.style.overflow = 'hidden';
-
-        if (s.borderType === 'solid-thin') {
-          inner.style.border = `0.6mm solid ${fg}`;
-          inner.style.borderRadius = '1.5mm';
-        } else if (s.borderType === 'solid-thick') {
-          inner.style.border = `1.2mm solid ${fg}`;
-          inner.style.borderRadius = '2mm';
-        } else if (s.borderType === 'double') {
-          inner.style.border = `1.4mm double ${fg}`;
-          inner.style.borderRadius = '1.5mm';
-        } else if (s.borderType === 'dashed') {
-          inner.style.border = `0.7mm dashed ${fg}`;
-          inner.style.borderRadius = '1.5mm';
-        }
-
-        // Üst İkon
-        if (s.iconType !== 'none') {
-          const iconWrap = document.createElement('div');
-          iconWrap.style.marginBottom = '1mm';
-          iconWrap.innerHTML = getThermalIconSVG(s.iconType, s.addCode ? 4.2 : 5.5, fg);
-          inner.appendChild(iconWrap);
-        }
-
-        const textToUse = s.useUpper ? turkishUpper(s.rawText) : s.rawText;
-        const lines = textToUse.split('\n').filter((l, idx, arr) => l.trim() !== '' || arr.length === 1);
-        const safeLines = lines.length ? lines : [' '];
-
-        let computedPt = s.manualPt;
-        if (s.autoFit) {
-          const longestLen = Math.max(...safeLines.map(l => l.trim().length), 1);
-          const availW = state.labelW - (s.borderType === 'none' ? 6 : 10);
-          const availH = state.labelH - (s.borderType === 'none' ? 6 : 10) - (s.iconType !== 'none' ? 6.5 : 0) - (s.addCode ? 14 : 0);
-          const ptByWidth = (availW * 2.8346) / (longestLen * 0.72);
-          const ptByHeight = (availH * 2.8346) / (safeLines.length * s.lineHeight * 1.12);
-          computedPt = Math.max(8, Math.min(35, Math.min(ptByWidth, ptByHeight)));
-        }
-
-        const textBlock = document.createElement('div');
-        textBlock.style.width = '100%';
-        textBlock.style.fontWeight = '900';
-        textBlock.style.lineHeight = String(s.lineHeight);
-        textBlock.style.color = fg;
-
-        safeLines.forEach((lineText, idx) => {
-          const lineEl = document.createElement('div');
-          lineEl.style.wordBreak = 'break-word';
-
-          const lineSpan = document.createElement('span');
-          lineSpan.className = 'h2c-text';
-          lineSpan.textContent = lineText;
-          lineSpan.style.display = 'inline-block';
-
-          if (idx === 0 && s.invertHeader && !s.invertAll) {
-            lineEl.style.background = '#000000';
-            lineEl.style.color = '#ffffff';
-            lineEl.style.padding = '0.9mm 2mm';
-            lineEl.style.borderRadius = '1mm';
-            lineEl.style.marginBottom = '1.1mm';
-            lineEl.style.display = 'flex';
-            lineEl.style.alignItems = 'center';
-            lineEl.style.justifyContent = s.align === 'center' ? 'center' : s.align === 'left' ? 'flex-start' : 'flex-end';
-            lineSpan.style.fontSize = `${Math.max(8, computedPt * 0.86).toFixed(1)}pt`;
-          } else if (idx === 0 && s.firstAccent && safeLines.length > 1) {
-            lineSpan.style.fontSize = `${(computedPt * 1.12).toFixed(1)}pt`;
-          } else {
-            lineSpan.style.fontSize = `${computedPt.toFixed(1)}pt`;
-          }
-          lineEl.appendChild(lineSpan);
-          textBlock.appendChild(lineEl);
-        });
-
-        inner.appendChild(textBlock);
-
-        // Opsiyonel Alt Barkod / QR
-        if (s.addCode && s.codeVal) {
-          const codeWrap = document.createElement('div');
-          codeWrap.style.width = '100%';
-          codeWrap.style.display = 'flex';
-          codeWrap.style.flexDirection = 'column';
-          codeWrap.style.alignItems = 'center';
-          codeWrap.style.marginTop = '1.2mm';
-          codeWrap.style.background = '#ffffff';
-          codeWrap.style.padding = s.invertAll ? '0.8mm' : '0';
-          codeWrap.style.borderRadius = '0.8mm';
-
-          if (s.codeType === 'QR') {
-            const qr = createQRCodeElement(s.codeVal, 72);
-            qr.style.width = '11mm';
-            qr.style.height = '11mm';
-            codeWrap.appendChild(qr);
-          } else {
-            const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-            svg.style.width = '82%';
-            svg.style.height = '9mm';
-            svg.style.display = 'block';
-            try {
-              JsBarcode(svg, s.codeVal, {
-                format: 'CODE128',
-                lineColor: '#000000',
-                background: '#ffffff',
-                width: 2,
-                height: 45,
-                displayValue: false,
-                margin: 0
-              });
-              svg.setAttribute('preserveAspectRatio', 'none');
-              codeWrap.appendChild(svg);
-
-              const num = document.createElement('div');
-              num.textContent = s.codeVal;
-              num.style.fontSize = '7.5pt';
-              num.style.fontWeight = '800';
-              num.style.color = '#000000';
-              num.style.marginTop = '0.3mm';
-              codeWrap.appendChild(num);
-            } catch (e) {}
-          }
-          inner.appendChild(codeWrap);
-        }
-
-        label.appendChild(inner);
-        return label;
-      }
-
-      // C) ÜRT / SKT & Parti (Lot) Gıda Etiketi Oluşturucu
-      function getSktSettings() {
-        return {
-          product: document.getElementById('skt-product').value.trim(),
-          urt: document.getElementById('skt-urt-date').value,
-          exp: document.getElementById('skt-exp-date').value,
-          lot: document.getElementById('skt-lot').value.trim(),
-          weight: document.getElementById('skt-weight').value.trim(),
-          storage: document.getElementById('skt-storage').value
-        };
-      }
-
-      function createSktLabelElement(customSettings = null) {
-        const s = customSettings || getSktSettings();
-        const widthRatio = state.labelW / 70;
-
-        const label = document.createElement('div');
-        label.className = 'thermal-label';
-        label.style.fontFamily = 'Inter, Arial, sans-serif';
-        label.style.padding = '1.6mm';
-
-        const inner = document.createElement('div');
-        inner.style.width = '100%';
-        inner.style.height = '100%';
-        inner.style.border = '0.7mm solid #000000';
-        inner.style.borderRadius = '1.6mm';
-        inner.style.display = 'flex';
-        inner.style.flexDirection = 'column';
-        inner.style.justifyContent = 'space-between';
-        inner.style.overflow = 'hidden';
-        inner.style.boxSizing = 'border-box';
-
-        // 1. Üst Ürün Adı (Dikeyde tam ortalı, alt çizgiye binmeyen ferah boşluk)
-        const prod = document.createElement('div');
-        const pText = turkishUpper(s.product || 'ÜRÜN ADI');
-        prod.style.display = 'flex';
-        prod.style.alignItems = 'center';
-        prod.style.justifyContent = 'center';
-        prod.style.textAlign = 'center';
-        prod.style.padding = '1.4mm 2mm';
-        prod.style.borderBottom = '0.45mm solid #000000';
-        prod.style.flexShrink = '0';
-
-        const prodSpan = document.createElement('span');
-        prodSpan.className = 'h2c-text';
-        prodSpan.textContent = pText;
-        prodSpan.style.fontWeight = '900';
-        const prodPt = pText.length > 32 ? 8.2 : pText.length > 22 ? 9.2 : 10.8;
-        prodSpan.style.fontSize = `${(prodPt * widthRatio).toFixed(1)}pt`;
-        prodSpan.style.lineHeight = '1.18';
-        prod.appendChild(prodSpan);
-        inner.appendChild(prod);
-
-        // 2. Orta Tarih Tablosu (ÜRT & SKT)
-        const mid = document.createElement('div');
-        mid.style.flex = '1 1 auto';
-        mid.style.minHeight = '0';
-        mid.style.display = 'grid';
-        mid.style.gridTemplateColumns = '1fr 1fr';
-        mid.style.alignItems = 'center';
-        mid.style.padding = '1mm 1.5mm';
-        mid.style.gap = '1mm';
-
-        const urtBox = document.createElement('div');
-        urtBox.style.textAlign = 'center';
-        urtBox.style.borderRight = '0.4mm dashed #000000';
-        urtBox.style.padding = '0.5mm 0';
-        urtBox.innerHTML = `<div class="h2c-text" style="font-size:${(6.6 * widthRatio).toFixed(1)}pt;font-weight:800;line-height:1.2;">ÜRETİM (ÜRT)</div><div class="h2c-text" style="font-size:${(10.2 * widthRatio).toFixed(1)}pt;font-weight:900;line-height:1.2;margin-top:0.8mm;">${formatDateTR(s.urt)}</div>`;
-
-        const expBox = document.createElement('div');
-        expBox.style.textAlign = 'center';
-        expBox.style.padding = '0.5mm 0';
-        expBox.innerHTML = `<div class="h2c-text" style="font-size:${(6.6 * widthRatio).toFixed(1)}pt;font-weight:800;line-height:1.2;">SON KULLANMA (SKT)</div><div class="h2c-text" style="font-size:${(10.2 * widthRatio).toFixed(1)}pt;font-weight:900;line-height:1.2;margin-top:0.8mm;">${formatDateTR(s.exp)}</div>`;
-
-        mid.appendChild(urtBox);
-        mid.appendChild(expBox);
-        inner.appendChild(mid);
-
-        // 3. Parti No & Ağırlık Satırı
-        if (s.lot || s.weight) {
-          const meta = document.createElement('div');
-          meta.style.display = 'flex';
-          meta.style.justifyContent = 'space-between';
-          meta.style.alignItems = 'center';
-          meta.style.padding = '1.2mm 2.2mm';
-          meta.style.borderTop = '0.45mm solid #000000';
-          meta.style.flexShrink = '0';
-          meta.innerHTML = `<span class="h2c-text" style="font-size:${(7.2 * widthRatio).toFixed(1)}pt;font-weight:800;line-height:1.2;">${escapeHtml(s.lot ? 'PARTİ: ' + s.lot : '')}</span><span class="h2c-text" style="font-size:${(7.2 * widthRatio).toFixed(1)}pt;font-weight:800;line-height:1.2;">${escapeHtml(turkishUpper(s.weight))}</span>`;
-          inner.appendChild(meta);
-        }
-
-        // 4. Alt Saklama Koşulu Siyah Şeridi
-        if (s.storage) {
-          const foot = document.createElement('div');
-          foot.style.background = '#000000';
-          foot.style.color = '#ffffff';
-          foot.style.display = 'flex';
-          foot.style.alignItems = 'center';
-          foot.style.justifyContent = 'center';
-          foot.style.textAlign = 'center';
-          foot.style.padding = '1.3mm 1.8mm';
-          foot.style.flexShrink = '0';
-
-          const footSpan = document.createElement('span');
-          footSpan.className = 'h2c-text';
-          footSpan.textContent = turkishUpper(s.storage);
-          footSpan.style.fontWeight = '900';
-          footSpan.style.fontSize = `${(7.6 * widthRatio).toFixed(1)}pt`;
-          footSpan.style.lineHeight = '1.18';
-          footSpan.style.letterSpacing = '0.02em';
-          foot.appendChild(footSpan);
-          inner.appendChild(foot);
-        }
-
-        label.appendChild(inner);
-        return label;
-      }
-
-      // ==========================================================
-      // 5. CANLI ÖNİZLEME VE ÖZET GÜNCELLEME
-      // ==========================================================
-      function renderLivePreview() {
-        const container = document.getElementById('live-preview-container');
-        const navBar = document.getElementById('preview-nav-bar');
-        container.innerHTML = '';
-
-        if (state.activeTab === 'excel') {
-          navBar.classList.remove('hidden');
-          const list = getSortedAndFilteredItems();
-          if (list.length === 0) {
-            container.appendChild(createBarcodeLabelElement({ name: 'SALÇA DOMATES', code: '02.01.01.0002', barcode: '2010100020004' }));
-            document.getElementById('preview-item-index').textContent = 'Örnek Önizleme';
-          } else {
-            if (state.previewIndex >= list.length) state.previewIndex = 0;
-            if (state.previewIndex < 0) state.previewIndex = list.length - 1;
-            container.appendChild(createBarcodeLabelElement(list[state.previewIndex]));
-            document.getElementById('preview-item-index').textContent = `${state.previewIndex + 1} / ${list.length}`;
-          }
-        } else if (state.activeTab === 'text') {
-          navBar.classList.add('hidden');
-          container.appendChild(createFreeTextLabelElement());
-        } else if (state.activeTab === 'skt') {
-          navBar.classList.add('hidden');
-          container.appendChild(createSktLabelElement());
-        } else if (state.activeTab === 'queue') {
-          if (state.queue.length === 0) {
-            navBar.classList.add('hidden');
-            container.appendChild(createFreeTextLabelElement({
-              ...getFreeTextSettings(),
-              rawText: 'KUYRUK BOŞ\nETİKET EKLEYİNİZ',
-              iconType: 'box',
-              borderType: 'dashed',
-              invertHeader: false,
-              invertAll: false,
-              addCode: false
-            }));
-          } else {
-            navBar.classList.remove('hidden');
-            if (state.queuePreviewIndex >= state.queue.length) state.queuePreviewIndex = 0;
-            if (state.queuePreviewIndex < 0) state.queuePreviewIndex = state.queue.length - 1;
-            container.appendChild(buildElementFromQueueJob(state.queue[state.queuePreviewIndex]));
-            document.getElementById('preview-item-index').textContent = `Kuyruk ${state.queuePreviewIndex + 1} / ${state.queue.length}`;
-          }
-        }
-
-        updatePrintSummary();
-      }
-
-      function buildElementFromQueueJob(job) {
-        if (job.builderType === 'barcode') return createBarcodeLabelElement(job.payload.item, job.payload.settings);
-        if (job.builderType === 'text') return createFreeTextLabelElement(job.payload.settings);
-        if (job.builderType === 'skt') return createSktLabelElement(job.payload.settings);
-        return createFreeTextLabelElement();
-      }
-
-      function getActivePrintJobs() {
-        // Döndürülen dizi: [{ build: () => HTMLElement, qty: number }]
-        if (state.activeTab === 'excel') {
-          const settings = getBarcodeSettings();
-          return getSortedAndFilteredItems()
-            .filter(it => it.selected && it.qty > 0)
-            .map(item => ({
-              qty: Math.max(1, parseInt(item.qty, 10) || 1),
-              build: () => createBarcodeLabelElement(item, settings)
-            }));
-        }
-        if (state.activeTab === 'text') {
-          const settings = getFreeTextSettings();
-          const qty = Math.max(1, parseInt(document.getElementById('txt-copy-count').value, 10) || 1);
-          return [{ qty, build: () => createFreeTextLabelElement(settings) }];
-        }
-        if (state.activeTab === 'skt') {
-          const settings = getSktSettings();
-          const qty = Math.max(1, parseInt(document.getElementById('skt-qty').value, 10) || 1);
-          return [{ qty, build: () => createSktLabelElement(settings) }];
-        }
-        if (state.activeTab === 'queue') {
-          return state.queue
-            .filter(j => j.qty > 0)
-            .map(job => ({
-              qty: Math.max(1, parseInt(job.qty, 10) || 1),
-              build: () => buildElementFromQueueJob(job)
-            }));
-        }
-        return [];
-      }
-
-      function updatePrintSummary() {
-        const jobs = getActivePrintJobs();
-        const totalLabels = jobs.reduce((sum, j) => sum + j.qty, 0);
-        const modeNames = {
-          excel: 'Excel Barkod',
-          text: 'Serbest Yazı',
-          skt: 'ÜRT/SKT Etiketi',
-          queue: 'Baskı Kuyruğu'
-        };
-
-        if (state.activeTab === 'excel') {
-          const selCount = state.items.filter(i => i.selected && i.qty > 0).length;
-          document.getElementById('selected-summary').textContent = `Seçili: ${selCount} ürün (${totalLabels} etiket)`;
-        }
-
-        document.getElementById('print-summary-text').textContent = `${modeNames[state.activeTab]} • ${totalLabels} Etiket (${state.labelW}×${state.labelH} mm)`;
-        document.getElementById('btn-print-label').textContent = totalLabels > 0 ? `Yazdır (${totalLabels})` : 'Yazdır';
-        document.getElementById('queue-badge').textContent = state.queue.reduce((s, j) => s + j.qty, 0);
-      }
-
-      // ==========================================================
-      // 6. DOĞRUDAN PC CHROME YAZDIRMA MOTORU
-      // ==========================================================
-      function executePrint() {
-        const jobs = getActivePrintJobs();
-        const total = jobs.reduce((s, j) => s + j.qty, 0);
-        if (total === 0) {
-          showToast('Yazdırılacak etiket bulunamadı. Lütfen ürün seçin veya metin girin.', 'error');
-          return;
-        }
-
-        const printArea = document.getElementById('print-area');
-        printArea.innerHTML = '';
-
-        const frag = document.createDocumentFragment();
-        jobs.forEach(job => {
-          for (let i = 0; i < job.qty; i++) {
-            const el = job.build();
-            el.classList.add('print-page');
-            frag.appendChild(el);
-          }
-        });
-        printArea.appendChild(frag);
-
-        // Chrome üstbilgi basarsa bile başlık görünmesin diye geçici olarak temizle
-        const origTitle = document.title;
-        document.title = ' ';
-
-        const restoreTitle = () => {
-          document.title = origTitle;
-          window.removeEventListener('afterprint', restoreTitle);
-        };
-        window.addEventListener('afterprint', restoreTitle);
-
-        // Tarayıcıya SVG ve QR canvas'ları çizmesi için kısa bir süre verip yazıcı penceresini aç
-        setTimeout(() => {
-          window.print();
-          setTimeout(restoreTitle, 1000);
-        }, 160);
-      }
-
-      // ==========================================================
-      // 7. GERÇEK ÇOK SAYFALI PDF İNDİRME MOTORU (jsPDF + html2canvas)
-      // ==========================================================
-      // html2canvas 1.4.1'deki metin aşağı kayma (baseline shift) hatasını düzelten yardımcı
-      function getHtml2CanvasOptions(bgColor) {
-        return {
-          scale: 3,
-          backgroundColor: bgColor || '#ffffff',
-          useCORS: true,
-          logging: false,
-          onclone: (clonedDoc) => {
-            clonedDoc.querySelectorAll('.h2c-text').forEach((node) => {
-              node.style.position = 'relative';
-              node.style.top = '-0.55mm';
-            });
-          }
-        };
-      }
-
-      async function executePdfDownload() {
-        const jobs = getActivePrintJobs();
-        const total = jobs.reduce((s, j) => s + j.qty, 0);
-        if (total === 0) {
-          showToast('PDF oluşturmak için en az 1 etiket olmalı.', 'error');
-          return;
-        }
-
-        if (!window.jspdf || !window.html2canvas) {
-          showToast('PDF kütüphaneleri henüz yüklenmedi, lütfen internet bağlantınızı kontrol edin.', 'error');
-          return;
-        }
-
-        if (document.fonts && document.fonts.ready) {
-          await document.fonts.ready;
-        }
-
-        state.pdfCancelled = false;
-        const modal = document.getElementById('pdf-progress-modal');
-        const pText = document.getElementById('pdf-progress-text');
-        const pBar = document.getElementById('pdf-progress-bar');
-        modal.classList.remove('hidden');
-        pText.textContent = `0 / ${total} etiket işleniyor...`;
-        pBar.style.width = '0%';
-
-        const sandbox = document.getElementById('pdf-render-sandbox');
-        sandbox.innerHTML = '';
-
-        try {
-          const { jsPDF } = window.jspdf;
-          const orientation = state.labelW >= state.labelH ? 'l' : 'p';
-          const doc = new jsPDF({
-            orientation,
-            unit: 'mm',
-            format: [state.labelW, state.labelH],
-            compress: true
-          });
-
-          let renderedCount = 0;
-          let isFirstPage = true;
-
-          // Aynı şablondan çoklu kopya varsa tek kez render edip PDF'e kopyalayarak hız kazan
-          for (const job of jobs) {
-            if (state.pdfCancelled) break;
-
-            sandbox.innerHTML = '';
-            const el = job.build();
-            sandbox.appendChild(el);
-
-            // Canvas'a yüksek çözünürlükle (scale: 3 ≈ 288 DPI) ve baseline düzeltmesiyle aktar
-            const canvas = await html2canvas(el, getHtml2CanvasOptions(el.style.background));
-            const imgData = canvas.toDataURL('image/png');
-
-            for (let c = 0; c < job.qty; c++) {
-              if (state.pdfCancelled) break;
-              if (!isFirstPage) {
-                doc.addPage([state.labelW, state.labelH], orientation);
-              }
-              isFirstPage = false;
-              doc.addImage(imgData, 'PNG', 0, 0, state.labelW, state.labelH, undefined, 'FAST');
-              renderedCount++;
-            }
-
-            const pct = Math.round((renderedCount / total) * 100);
-            pBar.style.width = `${pct}%`;
-            pText.textContent = `${renderedCount} / ${total} etiket işlendi (%${pct})`;
-            // Arayüzün donmaması için kısa nefes
-            await new Promise(r => setTimeout(r, 10));
-          }
-
-          sandbox.innerHTML = '';
-          modal.classList.add('hidden');
-
-          if (state.pdfCancelled) {
-            showToast('PDF oluşturma iptal edildi.', 'info');
-            return;
-          }
-
-          const stamp = getTodayISO().replace(/-/g, '');
-          const fileName = `TAC_${state.labelW}x${state.labelH}mm_${state.activeTab}_${stamp}.pdf`;
-          doc.save(fileName);
-          showToast(`${total} etiketlik PDF indirildi: ${fileName}`, 'success');
-        } catch (err) {
-          console.error(err);
-          sandbox.innerHTML = '';
-          modal.classList.add('hidden');
-          showToast('PDF oluşturulurken bir hata oluştu.', 'error');
-        }
-      }
-
-      // Tekli Etiketi 300 DPI PNG Olarak İndir
-      async function downloadCurrentPng() {
-        const previewEl = document.querySelector('#live-preview-container .thermal-label');
-        if (!previewEl || !window.html2canvas) {
-          showToast('Önizleme görseli hazırlanamadı.', 'error');
-          return;
-        }
-        try {
-          if (document.fonts && document.fonts.ready) {
-            await document.fonts.ready;
-          }
-          const sandbox = document.getElementById('pdf-render-sandbox');
-          sandbox.innerHTML = '';
-          const clone = previewEl.cloneNode(true);
-          sandbox.appendChild(clone);
-
-          const opts = getHtml2CanvasOptions(clone.style.background);
-          opts.scale = 4;
-          const canvas = await html2canvas(clone, opts);
-          sandbox.innerHTML = '';
-
-          const link = document.createElement('a');
-          link.download = `etiket_${state.labelW}x${state.labelH}mm.png`;
-          link.href = canvas.toDataURL('image/png');
-          link.click();
-          showToast('Etiket yüksek kaliteli PNG olarak indirildi.', 'success');
-        } catch (e) {
-          showToast('PNG indirilirken hata oluştu.', 'error');
-        }
-      }
-
-      // ==========================================================
-      // 8. EXCEL OKUMA, BOŞ ŞABLON İNDİRME VE TABLO
-      // ==========================================================
-      function handleExcelFile(file) {
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = function (e) {
-          try {
-            const data = new Uint8Array(e.target.result);
-            const workbook = XLSX.read(data, { type: 'array' });
-            const sheet = workbook.Sheets[workbook.SheetNames[0]];
-            const json = XLSX.utils.sheet_to_json(sheet, { defval: '' });
-
-            if (!json || json.length === 0) {
-              showToast('Excel dosyası boş görünüyor.', 'error');
-              return;
-            }
-
-            state.rawRows = json;
-            state.headers = Object.keys(json[0]);
-
-            populateColumnSelectors(state.headers);
-            buildItemsFromMapping();
-
-            const badge = document.getElementById('file-status-badge');
-            badge.textContent = `✓ ${file.name} (${json.length} satır)`;
-            badge.classList.remove('hidden');
-            document.getElementById('column-mapping-box').classList.remove('hidden');
-            showToast(`${json.length} ürün başarıyla yüklendi!`, 'success');
-          } catch (err) {
-            console.error(err);
-            showToast('Excel okunamadı. Geçerli bir .xlsx, .xls veya .csv dosyası seçin.', 'error');
-          }
-        };
-        reader.readAsArrayBuffer(file);
-      }
-
-      function downloadBlankExcelTemplate() {
-        try {
-          const wsData = [
-            ['Stok Kodu', 'Stok İsmi', 'Barkod'],
-            ['02.01.01.0001', 'SALÇA BİBER', '2010100010005'],
-            ['02.01.01.0002', 'SALÇA DOMATES', '2010100020004']
-          ];
-          const ws = XLSX.utils.aoa_to_sheet(wsData);
-          const wb = XLSX.utils.book_new();
-          XLSX.utils.book_append_sheet(wb, ws, 'Barkod Listesi');
-          XLSX.writeFile(wb, 'TAC_Ornek_Barkod_Sablonu.xlsx');
-          showToast('Örnek Excel şablonu indirildi.', 'success');
-        } catch (e) {
-          showToast('Excel şablonu oluşturulamadı.', 'error');
-        }
-      }
-
-      function populateColumnSelectors(headers) {
-        const nameSel = document.getElementById('map-name');
-        const codeSel = document.getElementById('map-code');
-        const bcSel = document.getElementById('map-barcode');
-
-        const buildOpts = (includeNone) => {
-          let html = includeNone ? '<option value="">-- Kullanma --</option>' : '';
-          headers.forEach(h => { html += `<option value="${escapeHtml(h)}">${escapeHtml(h)}</option>`; });
-          return html;
-        };
-
-        nameSel.innerHTML = buildOpts(false);
-        codeSel.innerHTML = buildOpts(true);
-        bcSel.innerHTML = buildOpts(true);
-
-        const findH = (keys) => headers.find(h => keys.some(k => turkishUpper(h).includes(k)));
-        const gName = findH(['STOK İSMİ', 'STOK ISMI', 'ÜRÜN', 'URUN', 'AD', 'İSİM', 'ISIM', 'NAME']) || headers[0];
-        const gCode = findH(['STOK KODU', 'KOD', 'SKU', 'CODE']) || '';
-        const gBc = findH(['BARKOD', 'BARCODE', 'EAN', 'UPC']) || (headers.length > 2 ? headers[2] : headers[headers.length - 1]);
-
-        nameSel.value = gName;
-        codeSel.value = gCode !== gName ? gCode : '';
-        bcSel.value = gBc || '';
-      }
-
-      function buildItemsFromMapping() {
-        const nameCol = document.getElementById('map-name').value;
-        const codeCol = document.getElementById('map-code').value;
-        const bcCol = document.getElementById('map-barcode').value;
-
-        state.items = state.rawRows.map((row, idx) => ({
-          id: idx + 1,
-          origIdx: idx,
-          name: String(row[nameCol] ?? '').replace(/\s+/g, ' ').trim(),
-          code: codeCol ? String(row[codeCol] ?? '').trim() : '',
-          barcode: bcCol ? String(row[bcCol] ?? '').trim() : '',
-          qty: 1,
-          selected: true
-        })).filter(it => it.name !== '' || it.barcode !== '');
-
-        state.previewIndex = 0;
-        renderExcelTable();
-        renderLivePreview();
-      }
-
-      function getSortedAndFilteredItems() {
-        const sortMode = document.getElementById('bc-sort').value;
-        const q = turkishUpper(state.searchQuery.trim());
-        let list = state.items.slice();
-        if (q) {
-          list = list.filter(it =>
-            turkishUpper(it.name).includes(q) ||
-            turkishUpper(it.code).includes(q) ||
-            turkishUpper(it.barcode).includes(q)
-          );
-        }
-        if (sortMode === 'az') list.sort((a, b) => turkishCompare(a.name, b.name));
-        else if (sortMode === 'za') list.sort((a, b) => turkishCompare(b.name, a.name));
-        else list.sort((a, b) => a.origIdx - b.origIdx);
-        return list;
-      }
-
-      function renderExcelTable() {
-        const tbody = document.getElementById('excel-table-body');
-        const list = getSortedAndFilteredItems();
-        document.getElementById('excel-count-badge').textContent = `${state.items.length} Ürün`;
-
-        if (list.length === 0) {
-          tbody.innerHTML = `<tr><td colspan="6" class="py-10 text-center text-slate-400">Gösterilecek ürün bulunamadı.</td></tr>`;
-          updatePrintSummary();
-          return;
-        }
-
-        const frag = document.createDocumentFragment();
-        list.forEach((item, displayIdx) => {
-          const tr = document.createElement('tr');
-          tr.className = `hover:bg-slate-50 transition cursor-pointer ${displayIdx === state.previewIndex ? 'bg-blue-50/70' : ''}`;
-          tr.innerHTML = `
-            <td class="py-2 pl-4 pr-2"><input type="checkbox" class="row-check rounded border-slate-300 text-slate-900" ${item.selected ? 'checked' : ''} /></td>
-            <td class="py-2 px-2 font-bold text-slate-800">${escapeHtml(item.name)}</td>
-            <td class="py-2 px-2 text-slate-500 font-mono hidden sm:table-cell">${escapeHtml(item.code || '-')}</td>
-            <td class="py-2 px-2 font-mono text-slate-700">${escapeHtml(item.barcode || '-')}</td>
-            <td class="py-2 px-2 text-center"><input type="number" min="1" max="500" value="${item.qty}" class="row-qty w-14 text-center font-bold bg-white border border-slate-200 rounded-lg py-0.5" /></td>
-            <td class="py-2 pr-3 pl-1 text-right"><button type="button" class="row-del text-slate-400 hover:text-rose-600 font-bold cursor-pointer" title="Sil">✕</button></td>
-          `;
-
-          tr.addEventListener('click', (e) => {
-            if (e.target.tagName === 'INPUT' || e.target.tagName === 'BUTTON') return;
-            state.previewIndex = displayIdx;
-            renderExcelTable();
-            renderLivePreview();
-          });
-
-          tr.querySelector('.row-check').addEventListener('change', (e) => {
-            item.selected = e.target.checked;
-            updatePrintSummary();
-          });
-
-          tr.querySelector('.row-qty').addEventListener('input', (e) => {
-            item.qty = Math.max(1, parseInt(e.target.value, 10) || 1);
-            updatePrintSummary();
-          });
-
-          tr.querySelector('.row-del').addEventListener('click', () => {
-            state.items = state.items.filter(x => x.id !== item.id);
-            renderExcelTable();
-            renderLivePreview();
-          });
-
-          frag.appendChild(tr);
-        });
-
-        tbody.innerHTML = '';
-        tbody.appendChild(frag);
-        updatePrintSummary();
-      }
-
-      // ==========================================================
-      // 9. KARIŞIK BASKI KUYRUĞU YÖNETİMİ
-      // ==========================================================
-      function addToQueue(title, badge, qty, builderType, payload) {
-        state.queue.push({
-          id: 'q_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
-          title,
-          badge,
-          qty: Math.max(1, parseInt(qty, 10) || 1),
-          builderType,
-          payload
-        });
-        renderQueueList();
-        updatePrintSummary();
-      }
-
-      function renderQueueList() {
-        const box = document.getElementById('queue-list-container');
-        if (state.queue.length === 0) {
-          box.innerHTML = `<div class="p-10 text-center text-xs text-slate-400">Kuyruğunuz şu an boş. Diğer sekmelerdeki <strong>+ Kuyruğa At</strong> butonlarını kullanabilirsiniz.</div>`;
-          return;
-        }
-
-        const frag = document.createDocumentFragment();
-        state.queue.forEach((job, idx) => {
-          const row = document.createElement('div');
-          row.className = `p-3.5 flex items-center justify-between gap-3 hover:bg-slate-50 cursor-pointer ${idx === state.queuePreviewIndex ? 'bg-blue-50/70' : ''}`;
-          row.innerHTML = `
-            <div class="min-w-0 flex-1">
-              <div class="flex items-center gap-2">
-                <span class="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-slate-200 text-slate-700">${escapeHtml(job.badge)}</span>
-                <p class="text-xs font-extrabold text-slate-900 truncate">${escapeHtml(job.title)}</p>
-              </div>
-            </div>
-            <div class="flex items-center gap-2 shrink-0">
-              <input type="number" min="1" max="500" value="${job.qty}" class="q-qty w-14 text-center text-xs font-extrabold bg-white border border-slate-200 rounded-lg py-1" />
-              <button type="button" class="q-del text-xs font-bold text-rose-500 hover:bg-rose-50 px-2 py-1 rounded-lg cursor-pointer">✕</button>
-            </div>
-          `;
-
-          row.addEventListener('click', (e) => {
-            if (e.target.tagName === 'INPUT' || e.target.tagName === 'BUTTON') return;
-            state.queuePreviewIndex = idx;
-            renderQueueList();
-            renderLivePreview();
-          });
-
-          row.querySelector('.q-qty').addEventListener('input', (e) => {
-            job.qty = Math.max(1, parseInt(e.target.value, 10) || 1);
-            updatePrintSummary();
-          });
-
-          row.querySelector('.q-del').addEventListener('click', () => {
-            state.queue = state.queue.filter(x => x.id !== job.id);
-            renderQueueList();
-            renderLivePreview();
-          });
-
-          frag.appendChild(row);
-        });
-
-        box.innerHTML = '';
-        box.appendChild(frag);
-      }
-
-      // ==========================================================
-      // 10. ŞABLONLAR (LOCALSTORAGE)
-      // ==========================================================
-      function loadSavedTemplates() {
-        try {
-          const raw = localStorage.getItem('tac_saved_templates_v2');
-          state.savedTemplates = raw ? JSON.parse(raw) : [];
-        } catch (e) {
-          state.savedTemplates = [];
-        }
-        renderPresetTemplates();
-      }
-
+// ... existing code ... -->
       function renderPresetTemplates() {
         const grid = document.getElementById('preset-templates-grid');
         grid.innerHTML = '';
         const all = [...DEFAULT_TEMPLATES, ...state.savedTemplates];
-        const filtered = state.activeTplCategory === 'all'
+        const q = turkishUpper((state.templateSearchQuery || '').trim());
+
+        let filtered = state.activeTplCategory === 'all'
           ? all
           : state.activeTplCategory === 'custom'
             ? state.savedTemplates
             : all.filter(t => t.cat === state.activeTplCategory);
 
-        if (filtered.length === 0) {
-          grid.innerHTML = `<p class="text-xs text-slate-400 py-2">Bu kategoride henüz kayıtlı şablon yok.</p>`;
-          return;
+        if (q) {
+          filtered = filtered.filter(t =>
+            turkishUpper(t.label).includes(q) ||
+            turkishUpper(t.text).includes(q)
+          );
         }
 
-        filtered.forEach(tpl => {
-          const wrap = document.createElement('div');
-          wrap.className = 'inline-flex items-center rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 transition overflow-hidden';
+        const countBadge = document.getElementById('tpl-count-badge');
+        if (countBadge) {
+          countBadge.textContent = q || state.activeTplCategory !== 'all'
+            ? `${filtered.length} / ${all.length} Şablon`
+            : `${all.length} Şablon`;
+        }
 
-          const btn = document.createElement('button');
-          btn.type = 'button';
-          btn.className = 'px-3 py-1.5 text-xs font-bold text-slate-800 cursor-pointer';
-          btn.textContent = tpl.label;
-          btn.addEventListener('click', () => {
-            document.getElementById('free-text-input').value = tpl.text;
-            document.getElementById('txt-icon').value = tpl.icon || 'none';
-            document.getElementById('txt-border').value = tpl.border || 'none';
-            document.getElementById('txt-first-accent').checked = !!tpl.firstAccent;
-            document.getElementById('txt-invert-header').checked = !!tpl.invertHeader;
-            document.getElementById('txt-invert-all').checked = !!tpl.invertAll;
-            document.getElementById('txt-autofit').checked = true;
-            document.getElementById('txt-size-val').textContent = 'Otomatik';
-            renderLivePreview();
-            showToast(`"${tpl.label}" şablonu uygulandı.`, 'info');
-          });
-          wrap.appendChild(btn);
-
-          if (tpl.isCustom) {
-            const del = document.createElement('button');
-            del.type = 'button';
-            del.className = 'px-2 py-1.5 text-[11px] font-bold text-rose-500 hover:bg-rose-100 border-l border-slate-200 cursor-pointer';
-            del.textContent = '✕';
-            del.addEventListener('click', () => {
-              state.savedTemplates = state.savedTemplates.filter(t => t.id !== tpl.id);
-              localStorage.setItem('tac_saved_templates_v2', JSON.stringify(state.savedTemplates));
-              renderPresetTemplates();
-              showToast('Kayıtlı şablon silindi.', 'info');
-            });
-            wrap.appendChild(del);
-          }
-
-          grid.appendChild(wrap);
-        });
-      }
-
-      // ==========================================================
-      // 11. OLAY DİNLEYİCİLERİ (EVENT LISTENERS)
-      // ==========================================================
-      function initEvents() {
-        // Sekme Geçişleri
-        document.querySelectorAll('.tab-btn').forEach(btn => {
-          btn.addEventListener('click', () => {
-            const tab = btn.dataset.tab;
-            state.activeTab = tab;
-
-            document.querySelectorAll('.tab-btn').forEach(b => {
-              b.className = 'tab-btn flex items-center gap-2 px-4 py-2.5 text-xs sm:text-sm font-semibold rounded-t-xl border-b-2 border-transparent text-slate-500 hover:text-slate-800 transition cursor-pointer';
-            });
-            btn.className = 'tab-btn flex items-center gap-2 px-4 py-2.5 text-xs sm:text-sm font-bold rounded-t-xl border-b-2 border-slate-900 text-slate-900 bg-slate-50 transition cursor-pointer';
-
-            document.querySelectorAll('.mode-panel').forEach(p => p.classList.add('hidden'));
-            document.getElementById(`panel-${tab}`).classList.remove('hidden');
-
-            renderLivePreview();
-          });
-        });
-
-        // Ctrl+P Klavye Kısayolunu Yakala -> Doğrudan Etiketleri Yazdır
-        window.addEventListener('keydown', (e) => {
-          if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'p') {
-            e.preventDefault();
-            executePrint();
-          }
-        });
-
-        // Boyut Seçici
-        const sizePreset = document.getElementById('size-preset');
-        const customBox = document.getElementById('custom-size-inputs');
-        const customW = document.getElementById('custom-w');
-        const customH = document.getElementById('custom-h');
-
-        sizePreset.addEventListener('change', () => {
-          if (sizePreset.value === 'custom') {
-            customBox.classList.remove('hidden');
-            customBox.classList.add('flex');
-            updateLabelDimensions(customW.value, customH.value);
-          } else {
-            customBox.classList.add('hidden');
-            customBox.classList.remove('flex');
-            const [w, h] = sizePreset.value.split('x').map(Number);
-            customW.value = w;
-            customH.value = h;
-            updateLabelDimensions(w, h);
-          }
-        });
-        customW.addEventListener('input', () => updateLabelDimensions(customW.value, customH.value));
-        customH.addEventListener('input', () => updateLabelDimensions(customW.value, customH.value));
-
-        // Yakınlaştırma
-        document.querySelectorAll('.zoom-btn').forEach(btn => {
-          btn.addEventListener('click', () => {
-            document.querySelectorAll('.zoom-btn').forEach(b => {
-              b.className = 'zoom-btn px-2 py-1 rounded text-slate-600 hover:text-slate-900 cursor-pointer';
-            });
-            btn.className = 'zoom-btn px-2 py-1 rounded bg-white shadow-xs text-slate-900 cursor-pointer';
-            document.getElementById('preview-zoom-wrapper').style.transform = `scale(${parseFloat(btn.dataset.zoom) || 1})`;
-          });
-        });
-
-        // Excel Yükleme & Örnekler
-        const dropzone = document.getElementById('dropzone');
-        const fileInput = document.getElementById('excel-file-input');
-        dropzone.addEventListener('click', () => fileInput.click());
-        fileInput.addEventListener('change', (e) => { if (e.target.files[0]) handleExcelFile(e.target.files[0]); fileInput.value = ''; });
-        dropzone.addEventListener('dragover', (e) => { e.preventDefault(); dropzone.classList.add('border-slate-900', 'bg-slate-100'); });
-        dropzone.addEventListener('dragleave', () => dropzone.classList.remove('border-slate-900', 'bg-slate-100'));
-        dropzone.addEventListener('drop', (e) => {
-          e.preventDefault();
-          dropzone.classList.remove('border-slate-900', 'bg-slate-100');
-          if (e.dataTransfer.files[0]) handleExcelFile(e.dataTransfer.files[0]);
-        });
-
-        document.getElementById('btn-download-sample-xlsx').addEventListener('click', downloadBlankExcelTemplate);
-        document.getElementById('btn-load-sample').addEventListener('click', () => {
-          state.items = SAMPLE_ITEMS.map((it, idx) => ({ id: idx + 1, origIdx: idx, ...it, qty: 1, selected: true }));
-          state.previewIndex = 0;
-          const badge = document.getElementById('file-status-badge');
-          badge.textContent = `✓ Örnek Liste Yüklendi (${state.items.length} ürün)`;
-          badge.classList.remove('hidden');
-          renderExcelTable();
-          renderLivePreview();
-          showToast('Örnek ürün listesi yüklendi!', 'success');
-        });
-
-        ['map-name', 'map-code', 'map-barcode'].forEach(id => {
-          document.getElementById(id).addEventListener('change', buildItemsFromMapping);
-        });
-
-        // Barkod Ayarları
-        ['bc-format', 'bc-sort', 'bc-font-family', 'bc-align', 'bc-code-prefix', 'bc-border', 'bc-extra-note', 'bc-uppercase', 'bc-show-code', 'bc-show-value'].forEach(id => {
-          const el = document.getElementById(id);
-          const handler = () => { if (id === 'bc-sort') renderExcelTable(); renderLivePreview(); };
-          el.addEventListener('input', handler);
-          el.addEventListener('change', handler);
-        });
-
-        document.getElementById('bc-height').addEventListener('input', (e) => {
-          document.getElementById('bc-height-val').textContent = `${e.target.value} mm`;
-          renderLivePreview();
-        });
-        document.getElementById('bc-font-scale').addEventListener('input', (e) => {
-          document.getElementById('bc-font-scale-val').textContent = `%${e.target.value}`;
-          renderLivePreview();
-        });
-
-        // Arama & Toplu Seçim
-        document.getElementById('excel-search').addEventListener('input', (e) => {
-          state.searchQuery = e.target.value;
-          state.previewIndex = 0;
-          renderExcelTable();
-          renderLivePreview();
-        });
-        document.getElementById('check-all-rows').addEventListener('change', (e) => {
-          getSortedAndFilteredItems().forEach(it => { it.selected = e.target.checked; });
-          renderExcelTable();
-        });
-        document.getElementById('btn-apply-bulk-qty').addEventListener('click', () => {
-          const qty = Math.max(1, parseInt(document.getElementById('bulk-qty-input').value, 10) || 1);
-          state.items.forEach(it => { if (it.selected) it.qty = qty; });
-          renderExcelTable();
-          showToast(`Seçili ürünlerin adedi ${qty} yapıldı.`, 'success');
-        });
-
-        // Excel -> Kuyruğa At
-        document.getElementById('btn-excel-to-queue').addEventListener('click', () => {
-          const selected = getSortedAndFilteredItems().filter(i => i.selected && i.qty > 0);
-          if (selected.length === 0) { showToast('Kuyruğa eklemek için ürün seçin.', 'error'); return; }
-          const settings = getBarcodeSettings();
-          selected.forEach(item => addToQueue(item.name, 'Barkod', item.qty, 'barcode', { item: { ...item }, settings }));
-          showToast(`${selected.length} ürün baskı kuyruğuna eklendi!`, 'success');
-        });
-
-        // Önizleme İleri/Geri
-        document.getElementById('btn-prev-item').addEventListener('click', () => {
-          if (state.activeTab === 'queue') { state.queuePreviewIndex--; renderQueueList(); }
-          else { state.previewIndex--; renderExcelTable(); }
-          renderLivePreview();
-        });
-        document.getElementById('btn-next-item').addEventListener('click', () => {
-          if (state.activeTab === 'queue') { state.queuePreviewIndex++; renderQueueList(); }
-          else { state.previewIndex++; renderExcelTable(); }
-          renderLivePreview();
-        });
-
-        // Manuel Ürün Modalı
-        const modal = document.getElementById('manual-modal');
-        const closeModal = () => modal.classList.add('hidden');
-        document.getElementById('btn-add-manual-row').addEventListener('click', () => {
-          document.getElementById('m-name').value = '';
-          document.getElementById('m-code').value = '';
-          document.getElementById('m-barcode').value = '';
-          document.getElementById('m-qty').value = '1';
-          modal.classList.remove('hidden');
-          document.getElementById('m-name').focus();
-        });
-        document.getElementById('btn-close-modal').addEventListener('click', closeModal);
-        document.getElementById('btn-cancel-modal').addEventListener('click', closeModal);
-        document.getElementById('btn-confirm-modal').addEventListener('click', () => {
-          const name = document.getElementById('m-name').value.trim();
-          if (!name) { showToast('Lütfen ürün ismi girin.', 'error'); return; }
-          state.items.unshift({
-            id: Date.now(),
-            origIdx: -1,
-            name,
-            code: document.getElementById('m-code').value.trim(),
-            barcode: document.getElementById('m-barcode').value.trim(),
-            qty: Math.max(1, parseInt(document.getElementById('m-qty').value, 10) || 1),
-            selected: true
-          });
-          state.previewIndex = 0;
-          closeModal();
-          renderExcelTable();
-          renderLivePreview();
-          showToast(`"${name}" listeye eklendi.`, 'success');
-        });
-
-        // Şablon Kategori Filtreleri
+        if (filtered.length === 0) {
+          grid.innerHTML = `<p class="text-xs text-slate-400 py-2">Bu arama veya kategoride şablon bulunamadı.</p>`;
+          return;
+        }
+// ... existing code ... -->
+        // Şablon Kategori Filtreleri ve Arama
         document.querySelectorAll('.tpl-cat-btn').forEach(btn => {
           btn.addEventListener('click', () => {
             state.activeTplCategory = btn.dataset.cat;
@@ -2417,168 +1135,10 @@ EDİNİZ</textarea>
           });
         });
 
-        // Serbest Metin Kontrolleri
-        ['free-text-input', 'txt-font-family', 'txt-align', 'txt-border', 'txt-icon', 'txt-uppercase', 'txt-first-accent', 'txt-invert-header', 'txt-invert-all', 'txt-code-type', 'txt-code-val'].forEach(id => {
-          const el = document.getElementById(id);
-          el.addEventListener('input', renderLivePreview);
-          el.addEventListener('change', renderLivePreview);
-        });
-
-        document.getElementById('txt-size').addEventListener('input', (e) => {
-          document.getElementById('txt-autofit').checked = false;
-          document.getElementById('txt-size-val').textContent = `${e.target.value} pt`;
-          renderLivePreview();
-        });
-        document.getElementById('txt-autofit').addEventListener('change', (e) => {
-          document.getElementById('txt-size-val').textContent = e.target.checked ? 'Otomatik' : `${document.getElementById('txt-size').value} pt`;
-          renderLivePreview();
-        });
-        document.getElementById('txt-leading').addEventListener('input', (e) => {
-          document.getElementById('txt-leading-val').textContent = e.target.value;
-          renderLivePreview();
-        });
-        document.getElementById('txt-add-code').addEventListener('change', (e) => {
-          document.getElementById('txt-code-box').classList.toggle('hidden', !e.target.checked);
-          document.getElementById('txt-code-type').classList.toggle('hidden', !e.target.checked);
-          renderLivePreview();
-        });
-
-        const copyInput = document.getElementById('txt-copy-count');
-        copyInput.addEventListener('input', updatePrintSummary);
-        document.getElementById('btn-qty-minus').addEventListener('click', () => { copyInput.value = Math.max(1, (parseInt(copyInput.value, 10) || 1) - 1); updatePrintSummary(); });
-        document.getElementById('btn-qty-plus').addEventListener('click', () => { copyInput.value = Math.min(500, (parseInt(copyInput.value, 10) || 1) + 1); updatePrintSummary(); });
-
-        document.getElementById('btn-insert-today').addEventListener('click', () => {
-          const ta = document.getElementById('free-text-input');
-          ta.value = (ta.value.trim() ? ta.value.trim() + '\n' : '') + `TARİH: ${formatDateTR(getTodayISO())}`;
-          renderLivePreview();
-        });
-        document.getElementById('btn-insert-time').addEventListener('click', () => {
-          const now = new Date();
-          const t = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-          const ta = document.getElementById('free-text-input');
-          ta.value = (ta.value.trim() ? ta.value.trim() + '\n' : '') + `SAAT: ${t}`;
-          renderLivePreview();
-        });
-        document.getElementById('btn-clear-text').addEventListener('click', () => {
-          document.getElementById('free-text-input').value = '';
-          renderLivePreview();
-        });
-
-        document.getElementById('btn-text-to-queue').addEventListener('click', () => {
-          const settings = getFreeTextSettings();
-          const qty = Math.max(1, parseInt(document.getElementById('txt-copy-count').value, 10) || 1);
-          const title = (settings.rawText.split('\n')[0] || 'Serbest Yazı').slice(0, 32);
-          addToQueue(title, 'Yazı', qty, 'text', { settings });
-          showToast(`"${title}" (${qty} adet) kuyruğa eklendi!`, 'success');
-        });
-
-        document.getElementById('btn-save-template').addEventListener('click', () => {
-          const text = document.getElementById('free-text-input').value.trim();
-          if (!text) { showToast('Kaydetmek için önce bir metin yazın.', 'error'); return; }
-          const firstLine = text.split('\n')[0].slice(0, 24);
-          state.savedTemplates.push({
-            id: 'custom_' + Date.now(),
-            cat: 'custom',
-            label: firstLine,
-            text,
-            icon: document.getElementById('txt-icon').value,
-            border: document.getElementById('txt-border').value,
-            firstAccent: document.getElementById('txt-first-accent').checked,
-            invertHeader: document.getElementById('txt-invert-header').checked,
-            invertAll: document.getElementById('txt-invert-all').checked,
-            isCustom: true
-          });
-          localStorage.setItem('tac_saved_templates_v2', JSON.stringify(state.savedTemplates));
+        document.getElementById('template-search').addEventListener('input', (e) => {
+          state.templateSearchQuery = e.target.value;
           renderPresetTemplates();
-          showToast(`"${firstLine}" şablon olarak kaydedildi!`, 'success');
         });
 
-        // ÜRT / SKT Modu Kontrolleri
-        ['skt-product', 'skt-urt-date', 'skt-exp-date', 'skt-lot', 'skt-weight', 'skt-storage', 'skt-qty'].forEach(id => {
-          const el = document.getElementById(id);
-          el.addEventListener('input', renderLivePreview);
-          el.addEventListener('change', renderLivePreview);
-        });
-
-        document.querySelectorAll('.skt-quick-btn').forEach(btn => {
-          btn.addEventListener('click', () => {
-            const days = parseInt(btn.dataset.days, 10) || 7;
-            const urtVal = document.getElementById('skt-urt-date').value || getTodayISO();
-            const d = new Date(urtVal + 'T00:00:00');
-            d.setDate(d.getDate() + days);
-            const y = d.getFullYear();
-            const m = String(d.getMonth() + 1).padStart(2, '0');
-            const day = String(d.getDate()).padStart(2, '0');
-            document.getElementById('skt-exp-date').value = `${y}-${m}-${day}`;
-            renderLivePreview();
-          });
-        });
-
-        const generateLot = () => {
-          const stamp = getTodayISO().replace(/-/g, '').slice(2);
-          const rand = String(Math.floor(10 + Math.random() * 89));
-          document.getElementById('skt-lot').value = `L${stamp}-${rand}`;
-          renderLivePreview();
-        };
-        document.getElementById('btn-gen-lot').addEventListener('click', generateLot);
-
-        document.getElementById('btn-skt-to-queue').addEventListener('click', () => {
-          const settings = getSktSettings();
-          const qty = Math.max(1, parseInt(document.getElementById('skt-qty').value, 10) || 1);
-          addToQueue(settings.product || 'ÜRT/SKT Etiketi', 'SKT', qty, 'skt', { settings });
-          showToast(`ÜRT/SKT etiketi (${qty} adet) kuyruğa eklendi!`, 'success');
-        });
-
-        // Kuyruk Temizle
-        document.getElementById('btn-clear-queue').addEventListener('click', () => {
-          state.queue = [];
-          renderQueueList();
-          renderLivePreview();
-          showToast('Baskı kuyruğu temizlendi.', 'info');
-        });
-
-        // Chrome Yardım Modalı
-        const chromeModal = document.getElementById('chrome-help-modal');
-        document.getElementById('btn-chrome-help').addEventListener('click', () => chromeModal.classList.remove('hidden'));
-        document.getElementById('btn-close-chrome-help').addEventListener('click', () => chromeModal.classList.add('hidden'));
-        document.getElementById('btn-ok-chrome-help').addEventListener('click', () => chromeModal.classList.add('hidden'));
-
-        // Yazdır, PDF İndir, PNG İndir ve PDF İptal
-        document.getElementById('btn-print-main').addEventListener('click', executePrint);
-        document.getElementById('btn-print-secondary').addEventListener('click', executePrint);
-        document.getElementById('btn-pdf-main').addEventListener('click', executePdfDownload);
-        document.getElementById('btn-pdf-secondary').addEventListener('click', executePdfDownload);
-        document.getElementById('btn-download-png').addEventListener('click', downloadCurrentPng);
-        document.getElementById('btn-cancel-pdf').addEventListener('click', () => { state.pdfCancelled = true; });
-      }
-
-      // ==========================================================
-      // 12. BAŞLATMA
-      // ==========================================================
-      window.addEventListener('DOMContentLoaded', () => {
-        // ÜRT/SKT Varsayılan Tarihleri (Bugün ve +7 Gün)
-        document.getElementById('skt-urt-date').value = getTodayISO(0);
-        document.getElementById('skt-exp-date').value = getTodayISO(7);
-        const stamp = getTodayISO().replace(/-/g, '').slice(2);
-        document.getElementById('skt-lot').value = `L${stamp}-01`;
-
-        initEvents();
-        loadSavedTemplates();
-
-        // Kayıtlı Ölçü Varsa Yükle
-        let initW = 70, initH = 44;
-        try {
-          const savedDims = JSON.parse(localStorage.getItem('tac_label_dims_v2'));
-          if (savedDims && savedDims.w && savedDims.h) {
-            initW = savedDims.w;
-            initH = savedDims.h;
-          }
-        } catch (e) {}
-
-        updateLabelDimensions(initW, initH);
-      });
-    })();
-  </script>
-</body>
-</html>
+        // Serbest Metin Kontrolleri
+// ... existing code ... -->
